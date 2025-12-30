@@ -1,0 +1,40 @@
+ProID_Studio/
+│
+├── backend/
+│   ├── src/
+│   │   ├── config/             # Database configuration
+│   │   │   └── db.js
+│   │   ├── models/             # MongoDB schemas
+│   │   │   └── User.js
+│   │   └── routes/             # API routes
+│   │       └── authRoute.js
+│   ├── server.js               # Main server file
+│   ├── package.json
+│   └── .env
+│
+├── frontend/
+│   ├── public/        
+│   │   ├── favicon         
+│   │   └── index.html       
+│   ├── src/
+│   │   ├── components/         # React components
+│   │   │   ├── Footer.jsx
+│   │   │   ├── Header.jsx         
+│   │   │   └── ProtectedRoute.jsx 
+│   │   ├── pages/         # Page components
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── GenerateID.jsx
+│   │   │   ├── Login.jsx
+│   │   │   ├── Register.jsx         
+│   │   │   └── UpdatePassword.jsx
+│   │   ├── services/      # API services
+│   │   ├── styles/        # CSS styles
+│   │   ├── App.js         # Main App component
+│   │   ├── index.css         
+│   │   └── index.js       # Entry point
+|   ├── tailwind.config.js
+│   └── package.json
+│
+├── .gitignore
+├── Structure.txt
+└── README.md

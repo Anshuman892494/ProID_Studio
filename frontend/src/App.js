@@ -5,6 +5,8 @@ import Register from "./pages/Register";
 import UpdatePassword from "./pages/UpdatePassword";
 import GenerateID from "./pages/GenerateID";
 import Dashboard from "./pages/Dashboard";
+import '@fortawesome/fontawesome-free/css/all.min.css';
+
 
 import "./styles/main.css"
 
