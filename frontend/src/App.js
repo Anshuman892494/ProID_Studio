@@ -5,18 +5,19 @@ import Register from "./pages/Register";
 import UpdatePassword from "./pages/UpdatePassword";
 import GenerateID from "./pages/GenerateID";
 import Dashboard from "./pages/Dashboard";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import ContactUs from "./pages/ContactUs";
+import About from "./pages/About";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
-
-import "./styles/main.css"
-
-/* 🔐 Protected Route Wrapper */
+/* Protected Route Wrapper */
 function ProtectedRoute({ children }) {
   const user = localStorage.getItem("user");
   return user ? children : <Navigate to="/login" replace />;
 }
 
-/* 🚫 Public Only Route (no access when logged in) */
+/* Public Only Route (no access when logged in) */
 function PublicRoute({ children }) {
   const user = localStorage.getItem("user");
   return !user ? children : <Navigate to="/" replace />; // Changed from /dashboard to /
@@ -40,6 +41,12 @@ export default function App() {
             <Register />
           </PublicRoute>
         } />
+
+        {/* LEGAL & INFO PAGES (Always Public) */}
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/contact" element={<ContactUs />} />
+        <Route path="/about" element={<About />} />
 
         {/* PROTECTED ROUTES */}
         <Route path="/generate" element={

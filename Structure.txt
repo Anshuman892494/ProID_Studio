@@ -24,6 +24,10 @@ ProID_Studio/
 │   │   ├── pages/         # Page components
 │   │   │   ├── Dashboard.jsx
 │   │   │   ├── GenerateID.jsx
+│   │   │   ├── ContactUs.jsx
+│   │   │   ├── About.jsx
+│   │   │   ├── PrivacyPolicy.jsx
+│   │   │   ├── TermsOfService.jsx
 │   │   │   ├── Login.jsx
 │   │   │   ├── Register.jsx         
 │   │   │   └── UpdatePassword.jsx

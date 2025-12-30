@@ -1,8 +1,5 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import "./Register.css";
 
 export default function Register() {
     const [form, setForm] = useState({
@@ -17,6 +14,8 @@ export default function Register() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [agreed, setAgreed] = useState(false);
+    const [passwordStrength, setPasswordStrength] = useState(0);
+    const [phoneError, setPhoneError] = useState("");
     const navigate = useNavigate();
 
     // Check if user is already logged in
@@ -27,9 +26,63 @@ export default function Register() {
         }
     }, [navigate]);
 
+    // Check password strength
+    useEffect(() => {
+        let strength = 0;
+        if (form.password.length >= 8) strength++;
+        if (/[A-Z]/.test(form.password)) strength++;
+        if (/[a-z]/.test(form.password)) strength++;
+        if (/[0-9]/.test(form.password)) strength++;
+        if (/[@$!%*?&]/.test(form.password)) strength++;
+        setPasswordStrength(strength);
+    }, [form.password]);
+
+    // Simple phone number validation
+    const validatePhone = (phone) => {
+        if (!phone.trim()) return ""; // Empty is okay since it's optional
+
+        // Remove all non-digit characters
+        const cleanPhone = phone.replace(/\D/g, '');
+
+        // 1. Check if it's exactly 10 digits
+        if (cleanPhone.length !== 10) {
+            return "Phone number must be exactly 10 digits";
+        }
+
+        // 2. Check if starts with 0
+        if (cleanPhone.startsWith('0')) {
+            return "Phone number should not start with 0";
+        }
+
+        // 3. Check if contains only numbers
+        if (!/^\d+$/.test(cleanPhone)) {
+            return "Phone number should contain only numbers";
+        }
+
+        return ""; // Valid phone number
+    };
+
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setForm(prev => ({ ...prev, [name]: value }));
+
+        if (name === "phone") {
+            // Allow only digits
+            const digitsOnly = value.replace(/\D/g, '');
+
+            // Update form with digits only
+            setForm(prev => ({ ...prev, [name]: digitsOnly }));
+
+            // Validate phone number
+            if (digitsOnly) {
+                const validationError = validatePhone(digitsOnly);
+                setPhoneError(validationError);
+            } else {
+                setPhoneError(""); // Clear error if empty
+            }
+        } else {
+            setForm(prev => ({ ...prev, [name]: value }));
+        }
+
         setError("");
     };
 
@@ -37,12 +90,9 @@ export default function Register() {
         // Clear previous errors
         setError("");
 
-        // 🔐 EMAIL VALIDATION
+        // Email validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const allowedDomains = ["gmail.com", "outlook.com", "yahoo.com"];
-
-        // 🔐 STRONG PASSWORD VALIDATION (from working example)
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
 
         // Name validation
         if (!form.name.trim()) {
@@ -56,14 +106,15 @@ export default function Register() {
             return false;
         }
 
-        // ✅ SAFE DOMAIN CHECK (FIX from working example)
+        // Domain check
         const emailDomain = form.email.split("@")[1];
         if (!emailDomain || !allowedDomains.includes(emailDomain)) {
             setError("Please use a valid email provider (gmail, outlook, yahoo)");
             return false;
         }
 
-        // Password validation from working example
+        // Password validation
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
         if (!passwordRegex.test(form.password)) {
             setError(
                 "Password must be at least 8 characters and include uppercase, lowercase, number, and special character"
@@ -75,6 +126,15 @@ export default function Register() {
         if (form.password !== form.confirmPassword) {
             setError("Passwords do not match");
             return false;
+        }
+
+        // Phone validation (only if provided)
+        if (form.phone.trim()) {
+            const phoneValidationError = validatePhone(form.phone);
+            if (phoneValidationError) {
+                setError(phoneValidationError);
+                return false;
+            }
         }
 
         // Terms agreement validation
@@ -126,332 +186,332 @@ export default function Register() {
                 }
 
                 // Show success message
-                alert("Registration successful! Redirecting to login...");
+                setError("success:Registration successful! Redirecting to login...");
 
-                // Redirect to login page
-                navigate("/login");
+                // Redirect to login page after delay
+                setTimeout(() => {
+                    navigate("/login");
+                }, 1500);
             } else {
                 setError(data.message || "Registration failed");
             }
         } catch (err) {
             console.error("Registration error:", err);
-            setError("Network error! Is your backend running?");
+            setError("Network error! Please check your connection.");
         } finally {
             setLoading(false);
         }
     };
 
-    return (
-        <div>
-            <Header />
+    const getPasswordStrengthColor = (strength) => {
+        if (strength <= 2) return "bg-red-500";
+        if (strength <= 3) return "bg-yellow-500";
+        return "bg-green-500";
+    };
 
-            <main className="container">
-                <section className="active" style={{ padding: '3rem 0' }}>
-                    <div className="section-title">
-                        <h2>Create Your Account</h2>
-                        <p>Join thousands of organizations using our ID Card Generator</p>
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+
+            <main className="container mx-auto px-4 py-8">
+                {/* Main Container */}
+                <div className="max-w-2xl mx-auto animate-fade-in">
+                    {/* Header Section */}
+                    <div className="text-center mb-10">
+                        <h1 className="text-xl md:text-4xl font-bold text-primary mb-3">
+                            Create Your Account
+                        </h1>
+                        <p className="text-gray-600 text-lg max-w-md mx-auto">
+                            Join our ID Card Generator studio
+                        </p>
                     </div>
 
-                    <div className="form-section">
-                        <div className="form-container" style={{
-                            gridTemplateColumns: '1fr 1fr',
-                            maxWidth: '1000px',
-                            margin: '0 auto'
-                        }}>
-                            {/* Left Column - Form */}
-                            <div className="form-column">
-                                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                        <div className="form-group">
-                                            <label htmlFor="name" style={{ fontWeight: '600', color: '#09758a', marginBottom: '0.5rem' }}>
-                                                <i className="fas fa-user"></i> Full Name *
-                                            </label>
-                                            <input
-                                                id="name"
-                                                name="name"
-                                                type="text"
-                                                value={form.name}
-                                                onChange={handleChange}
-                                                placeholder="Enter your full name"
-                                                required
-                                                disabled={loading}
-                                                autoComplete="off"
-                                                style={{
-                                                    width: '100%',
-                                                    padding: '0.8rem',
-                                                    border: '1px solid #ddd',
-                                                    borderRadius: '4px',
-                                                    fontSize: '1rem',
-                                                    backgroundColor: loading ? '#f5f5f5' : 'white'
-                                                }}
-                                            />
-                                        </div>
+                    {/* Registration Form */}
+                    <div className="bg-white rounded-2xl shadow-xl p-8">
 
-                                        <div className="form-group">
-                                            <label htmlFor="email" style={{ fontWeight: '600', color: '#09758a', marginBottom: '0.5rem' }}>
-                                                <i className="fas fa-envelope"></i> Email Address *
-                                            </label>
-                                            <input
-                                                id="email"
-                                                name="email"
-                                                type="email"
-                                                value={form.email}
-                                                onChange={handleChange}
-                                                placeholder="Enter your email"
-                                                required
-                                                disabled={loading}
-                                                autoComplete="off"
-                                                autoCorrect="off"
-                                                autoCapitalize="none"
-                                                spellCheck="false"
-                                                style={{
-                                                    width: '100%',
-                                                    padding: '0.8rem',
-                                                    border: '1px solid #ddd',
-                                                    borderRadius: '4px',
-                                                    fontSize: '1rem',
-                                                    backgroundColor: loading ? '#f5f5f5' : 'white'
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                        <div className="form-group">
-                                            <label htmlFor="password" style={{ fontWeight: '600', color: '#09758a', marginBottom: '0.5rem' }}>
-                                                <i className="fas fa-lock"></i> Password *
-                                            </label>
-                                            <input
-                                                id="password"
-                                                name="password"
-                                                type="password"
-                                                value={form.password}
-                                                onChange={handleChange}
-                                                placeholder="Min. 8 chars: A-Z, a-z, 0-9, special char"
-                                                required
-                                                disabled={loading}
-                                                autoComplete="new-password"
-                                                style={{
-                                                    width: '100%',
-                                                    padding: '0.8rem',
-                                                    border: '1px solid #ddd',
-                                                    borderRadius: '4px',
-                                                    fontSize: '1rem',
-                                                    backgroundColor: loading ? '#f5f5f5' : 'white'
-                                                }}
-                                            />
-                                        </div>
-
-                                        <div className="form-group">
-                                            <label htmlFor="confirmPassword" style={{ fontWeight: '600', color: '#09758a', marginBottom: '0.5rem' }}>
-                                                <i className="fas fa-lock"></i> Confirm Password *
-                                            </label>
-                                            <input
-                                                id="confirmPassword"
-                                                name="confirmPassword"
-                                                type="password"
-                                                value={form.confirmPassword}
-                                                onChange={handleChange}
-                                                placeholder="Confirm your password"
-                                                required
-                                                disabled={loading}
-                                                autoComplete="new-password"
-                                                style={{
-                                                    width: '100%',
-                                                    padding: '0.8rem',
-                                                    border: '1px solid #ddd',
-                                                    borderRadius: '4px',
-                                                    fontSize: '1rem',
-                                                    backgroundColor: loading ? '#f5f5f5' : 'white'
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                        <div className="form-group">
-                                            <label htmlFor="organization" style={{ fontWeight: '600', color: '#09758a', marginBottom: '0.5rem' }}>
-                                                <i className="fas fa-building"></i> Organization
-                                            </label>
-                                            <input
-                                                id="organization"
-                                                name="organization"
-                                                type="text"
-                                                value={form.organization}
-                                                onChange={handleChange}
-                                                placeholder="Your company/school name"
-                                                disabled={loading}
-                                                autoComplete="off"
-                                                style={{
-                                                    width: '100%',
-                                                    padding: '0.8rem',
-                                                    border: '1px solid #ddd',
-                                                    borderRadius: '4px',
-                                                    fontSize: '1rem',
-                                                    backgroundColor: loading ? '#f5f5f5' : 'white'
-                                                }}
-                                            />
-                                        </div>
-
-                                        <div className="form-group">
-                                            <label htmlFor="phone" style={{ fontWeight: '600', color: '#09758a', marginBottom: '0.5rem' }}>
-                                                <i className="fas fa-phone"></i> Phone Number
-                                            </label>
-                                            <input
-                                                id="phone"
-                                                name="phone"
-                                                type="tel"
-                                                value={form.phone}
-                                                onChange={handleChange}
-                                                placeholder="Your phone number"
-                                                disabled={loading}
-                                                autoComplete="off"
-                                                style={{
-                                                    width: '100%',
-                                                    padding: '0.8rem',
-                                                    border: '1px solid #ddd',
-                                                    borderRadius: '4px',
-                                                    fontSize: '1rem',
-                                                    backgroundColor: loading ? '#f5f5f5' : 'white'
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '1rem 0' }}>
-                                        <input
-                                            type="checkbox"
-                                            id="agree"
-                                            checked={agreed}
-                                            onChange={(e) => setAgreed(e.target.checked)}
-                                            disabled={loading}
-                                            style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
-                                        />
-                                        <label htmlFor="agree" style={{ cursor: loading ? 'not-allowed' : 'pointer' }}>
-                                            I agree to the <Link to="/terms" style={{ color: '#04675b' }}>Terms of Service</Link> and <Link to="/privacy" style={{ color: '#04675b' }}>Privacy Policy</Link> *
-                                        </label>
-                                    </div>
-
-                                    {error && (
-                                        <div style={{
-                                            background: '#fee',
-                                            color: '#c33',
-                                            padding: '1rem',
-                                            borderRadius: '6px',
-                                            borderLeft: '4px solid #c33',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '0.75rem'
-                                        }}>
-                                            <i className="fas fa-exclamation-circle"></i> {error}
-                                        </div>
-                                    )}
-
-                                    <button
-                                        type="submit"
-                                        disabled={loading}
-                                        style={{
-                                            width: '100%',
-                                            padding: '1rem',
-                                            background: '#04675b',
-                                            color: 'white',
-                                            border: 'none',
-                                            borderRadius: '50px',
-                                            fontSize: '1rem',
-                                            fontWeight: '600',
-                                            cursor: loading ? 'not-allowed' : 'pointer',
-                                            opacity: loading ? 0.7 : 1,
-                                            transition: 'all 0.3s ease'
-                                        }}
-                                    >
-                                        {loading ? (
-                                            <>
-                                                <i className="fas fa-spinner fa-spin"></i> Creating Account...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <i className="fas fa-user-plus"></i> Create Account
-                                            </>
-                                        )}
-                                    </button>
-
-                                    <div style={{ textAlign: 'center', marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid #ddd' }}>
-                                        <p>
-                                            Already have an account? <Link to="/login" style={{ color: '#04675b', fontWeight: '600' }}>Sign in here</Link>
-                                        </p>
-                                    </div>
-                                </form>
+                        {/* Status Message */}
+                        {error && (
+                            <div className={`mb-6 p-4 rounded-lg ${error.startsWith("success:") ? "bg-green-50 border border-green-200" :
+                                "bg-red-50 border border-red-200"
+                                }`}>
+                                <div className="flex items-start gap-3">
+                                    <i className={`fas ${error.startsWith("success:") ? "fa-check-circle text-green-500" :
+                                        "fa-exclamation-circle text-red-500"
+                                        } mt-0.5`}></i>
+                                    <span className={`text-sm ${error.startsWith("success:") ? "text-green-700" :
+                                        "text-red-700"
+                                        }`}>
+                                        {error.replace("success:", "")}
+                                    </span>
+                                </div>
                             </div>
+                        )}
 
-                            {/* Right Column - Benefits */}
-                            <div style={{
-                                background: 'linear-gradient(135deg, #04675b 0%, #09758a 100%)',
-                                borderRadius: '10px',
-                                padding: '2rem',
-                                color: 'white',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                justifyContent: 'center'
-                            }}>
-                                <h3 style={{ textAlign: 'center', marginBottom: '2rem', fontSize: '1.8rem' }}>
-                                    <i className="fas fa-gift" style={{ marginRight: '0.5rem' }}></i> Benefits of Registration
-                                </h3>
-
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
-                                        <i className="fas fa-save" style={{ fontSize: '1.5rem', color: '#1ee5ff', marginTop: '0.25rem' }}></i>
-                                        <div>
-                                            <h4 style={{ marginBottom: '0.25rem', fontSize: '1.1rem' }}>Save & Manage Templates</h4>
-                                            <p style={{ color: 'rgba(255, 255, 255, 0.85)', margin: 0, fontSize: '0.95rem' }}>
-                                                Store your custom ID card designs for future use
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
-                                        <i className="fas fa-cloud" style={{ fontSize: '1.5rem', color: '#1ee5ff', marginTop: '0.25rem' }}></i>
-                                        <div>
-                                            <h4 style={{ marginBottom: '0.25rem', fontSize: '1.1rem' }}>Cloud Storage</h4>
-                                            <p style={{ color: 'rgba(255, 255, 255, 0.85)', margin: 0, fontSize: '0.95rem' }}>
-                                                Access your ID cards from any device, anywhere
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
-                                        <i className="fas fa-bolt" style={{ fontSize: '1.5rem', color: '#1ee5ff', marginTop: '0.25rem' }}></i>
-                                        <div>
-                                            <h4 style={{ marginBottom: '0.25rem', fontSize: '1.1rem' }}>Faster Generation</h4>
-                                            <p style={{ color: 'rgba(255, 255, 255, 0.85)', margin: 0, fontSize: '0.95rem' }}>
-                                                Quickly generate multiple IDs with saved profiles
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
-                                        <i className="fas fa-shield-alt" style={{ fontSize: '1.5rem', color: '#1ee5ff', marginTop: '0.25rem' }}></i>
-                                        <div>
-                                            <h4 style={{ marginBottom: '0.25rem', fontSize: '1.1rem' }}>Enhanced Security</h4>
-                                            <p style={{ color: 'rgba(255, 255, 255, 0.85)', margin: 0, fontSize: '0.95rem' }}>
-                                                Your data is encrypted and protected
-                                            </p>
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            {/* Name and Email */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
+                                        Full Name *
+                                    </label>
+                                    <div className="relative">
+                                        <input
+                                            id="name"
+                                            name="name"
+                                            type="text"
+                                            value={form.name}
+                                            onChange={handleChange}
+                                            placeholder="Enter your full name"
+                                            required
+                                            disabled={loading}
+                                            autoComplete="off"
+                                            className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                        />
+                                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                                            <i className="fas fa-user text-gray-400"></i>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div style={{ marginTop: '2rem', padding: '1rem', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '6px' }}>
-                                    <p style={{ margin: 0, textAlign: 'center', fontSize: '0.9rem' }}>
-                                        <i className="fas fa-info-circle" style={{ marginRight: '0.5rem' }}></i>
-                                        Your information is secured with industry-standard encryption
+                                <div>
+                                    <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                                        Email Address *
+                                    </label>
+                                    <div className="relative">
+                                        <input
+                                            id="email"
+                                            name="email"
+                                            type="email"
+                                            value={form.email}
+                                            onChange={handleChange}
+                                            placeholder="you@example.com"
+                                            required
+                                            disabled={loading}
+                                            autoComplete="off"
+                                            autoCorrect="off"
+                                            autoCapitalize="none"
+                                            spellCheck="false"
+                                            className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                        />
+                                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                                            <i className="fas fa-envelope text-gray-400"></i>
+                                        </div>
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        Use gmail, outlook, or yahoo email
                                     </p>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </section>
-            </main>
 
-            <Footer />
+                            {/* Password Fields */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+                                        Password *
+                                    </label>
+                                    <div className="relative">
+                                        <input
+                                            id="password"
+                                            name="password"
+                                            type="password"
+                                            value={form.password}
+                                            onChange={handleChange}
+                                            placeholder="Create a strong password"
+                                            required
+                                            disabled={loading}
+                                            autoComplete="new-password"
+                                            className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                        />
+                                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                                            <i className="fas fa-lock text-gray-400"></i>
+                                        </div>
+                                    </div>
+
+                                    {/* Password Strength Indicator */}
+                                    {form.password && (
+                                        <div className="mt-2">
+                                            <div className="flex justify-between text-xs text-gray-600 mb-1">
+                                                <span>Password strength:</span>
+                                                <span className="font-medium">
+                                                    {passwordStrength <= 2 ? "Weak" : passwordStrength <= 3 ? "Good" : "Strong"}
+                                                </span>
+                                            </div>
+                                            <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                                <div
+                                                    className={`h-full ${getPasswordStrengthColor(passwordStrength)} transition-all duration-300`}
+                                                    style={{ width: `${(passwordStrength / 5) * 100}%` }}
+                                                ></div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 mb-2">
+                                        Confirm Password *
+                                    </label>
+                                    <div className="relative">
+                                        <input
+                                            id="confirmPassword"
+                                            name="confirmPassword"
+                                            type="password"
+                                            value={form.confirmPassword}
+                                            onChange={handleChange}
+                                            placeholder="Confirm your password"
+                                            required
+                                            disabled={loading}
+                                            autoComplete="new-password"
+                                            className={`w-full px-4 py-3 pl-12 border rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed 
+                                                ${form.confirmPassword
+                                                    ? form.password === form.confirmPassword
+                                                        ? 'border-green-300'
+                                                        : 'border-red-300'
+                                                    : 'border-gray-300'
+                                                }`}
+                                        />
+                                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                                            <i className="fas fa-lock text-gray-400"></i>
+                                        </div>
+                                        {form.confirmPassword && form.password === form.confirmPassword && (
+                                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                                <i className="fas fa-check text-green-500"></i>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Organization and Phone */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label htmlFor="organization" className="block text-sm font-semibold text-gray-700 mb-2">
+                                        Organization
+                                        {/* <span className="text-gray-500 text-xs font-normal ml-1">(Optional)</span> */}
+                                    </label>
+                                    <div className="relative">
+                                        <input
+                                            id="organization"
+                                            name="organization"
+                                            type="text"
+                                            value={form.organization}
+                                            onChange={handleChange}
+                                            placeholder="Your company/school name"
+                                            disabled={loading}
+                                            autoComplete="off"
+                                            className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                        />
+                                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                                            <i className="fas fa-building text-gray-400"></i>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
+                                        Phone Number
+                                    </label>
+                                    <div className="relative">
+                                        <input
+                                            id="phone"
+                                            name="phone"
+                                            type="tel"
+                                            value={form.phone}
+                                            onChange={handleChange}
+                                            placeholder="Enter your phone number"
+                                            disabled={loading}
+                                            autoComplete="off"
+                                            maxLength={10}
+                                            className={`w-full px-4 py-3 pl-12 border rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed 
+                                                ${phoneError ? 'border-red-300'
+                                                    : form.phone && !phoneError
+                                                        ? 'border-gray-300'
+                                                        : 'border-gray-300'
+                                                }`}
+                                        />
+                                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                                            <i className="fas fa-phone text-gray-400"></i>
+                                        </div>
+                                        {form.phone && !phoneError && form.phone.length === 10 && (
+                                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                                <i className="fas fa-check text-green-500"></i>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Phone validation messages */}
+                                    {phoneError && (
+                                        <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                                            <i className="fas fa-exclamation-circle"></i>
+                                            {phoneError}
+                                        </p>
+                                    )}
+
+                                </div>
+                            </div>
+
+                            {/* Terms Agreement */}
+                            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+                                <input
+                                    type="checkbox"
+                                    id="agree"
+                                    checked={agreed}
+                                    onChange={(e) => setAgreed(e.target.checked)}
+                                    disabled={loading}
+                                    className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary/50 mt-1 flex-shrink-0"
+                                />
+                                <label htmlFor="agree" className="text-sm text-gray-700">
+                                    I agree to the{" "}
+                                    <Link to="/terms" className="text-primary hover:text-secondary font-medium">
+                                        Terms of Service
+                                    </Link>{" "}
+                                    and{" "}
+                                    <Link to="/privacy" className="text-primary hover:text-secondary font-medium">
+                                        Privacy Policy
+                                    </Link>
+                                    . I understand that my data will be processed in accordance with these policies.
+                                </label>
+                            </div>
+
+                            {/* Submit Button */}
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 hover:shadow-lg hover:translate-y-[-1px] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            >
+                                {loading ? (
+                                    <>
+                                        <i className="fas fa-spinner fa-spin"></i>
+                                        Creating Account...
+                                    </>
+                                ) : (
+                                    <>
+                                        <i className="fas fa-user-plus"></i>
+                                        Create Account
+                                    </>
+                                )}
+                            </button>
+
+                            {/* Security Note */}
+                            <div className="flex items-center justify-center gap-2 text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
+                                <i className="fas fa-shield-alt text-primary"></i>
+                                <span>Your information is secured with industry-standard encryption</span>
+                            </div>
+
+                            {/* Login Link */}
+                            <div className="text-center pt-4 border-t border-gray-200">
+                                <p className="text-gray-600">
+                                    Already have an account?{" "}
+                                    <Link
+                                        to="/login"
+                                        className="text-primary hover:text-secondary font-semibold transition-colors duration-300"
+                                    >
+                                        Sign in here
+                                    </Link>
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
         </div>
     );
 }

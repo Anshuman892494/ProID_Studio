@@ -1,8 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import "./Login.css";
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -51,11 +48,6 @@ export default function Login() {
     }
 
     return true;
-  };
-
-  const handleSocialLogin = (provider) => {
-    setError(`Connecting with ${provider}... (Feature in development)`);
-    console.log(`Social login with ${provider}`);
   };
 
   const handleSubmit = async (e) => {
@@ -108,13 +100,6 @@ export default function Login() {
       setLoading(false);
     }
   };
-  const handleForgotPassword = () => {
-    if (form.email) {
-      setError(`info:Password reset link will be sent to ${form.email} (Feature in development)`);
-    } else {
-      setError("Please enter your email address first");
-    }
-  };
 
   // Check if error message is success/info type
   const getMessageType = (message) => {
@@ -129,213 +114,185 @@ export default function Login() {
     return message;
   };
 
+  const messageType = error ? getMessageType(error) : "";
+  const messageText = error ? getMessageText(error) : "";
+
   return (
-    <div className="login-page">
-      <Header />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
 
-      <main className="container">
-        <section className="login-section active">
-          <div className="section-title">
-            <h2>Welcome Back</h2>
-            <p>Sign in to your account to access the ID Card Generator</p>
+      <main className="container mx-auto py-8">
+        {/* Main Content Container */}
+        <div className="max-w-md mx-auto animate-fade-in">
+          {/* Header Section */}
+          <div className="text-center mb-10">
+            <h1 className="text-xl md:text-4xl font-bold text-primary mb-3">
+              Welcome Back
+            </h1>
+            <p className="text-gray-600 text-lg">
+              Sign in to access your ID Card Studio
+            </p>
           </div>
 
-          <div className="login-form-container">
-            {/* Left Column - Login Form */}
-            <div className="form-column">
-              <form onSubmit={handleSubmit} className="login-form">
-                <div className="form-group">
-                  <label htmlFor="email">
-                    <i className="fas fa-envelope icon-left"></i>
-                    Email Address
-                  </label>
-                  <div className="input-with-icon">
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={form.email}
-                      onChange={handleChange}
-                      placeholder="Enter your email address"
-                      required
-                      disabled={loading}
-                      className="icon-input"
-                    />
-                    <i className="fas fa-user input-icon-right"></i>
+          {/* Login Form */}
+          <div className="bg-white rounded-2xl shadow-xl p-8">
+            {/* Status Message */}
+            {error && (
+              <div className={`mb-6 p-4 rounded-lg ${messageType === "success" ? "bg-green-50 border border-green-200" :
+                messageType === "info" ? "bg-blue-50 border border-blue-200" :
+                  "bg-red-50 border border-red-200"
+                }`}>
+                <div className="flex items-start gap-3">
+                  <i className={`fas ${messageType === "success" ? "fa-check-circle text-green-500" :
+                    messageType === "info" ? "fa-info-circle text-blue-500" :
+                      "fa-exclamation-circle text-red-500"
+                    } mt-0.5`}></i>
+                  <span className={`text-sm ${messageType === "success" ? "text-green-700" :
+                    messageType === "info" ? "text-blue-700" :
+                      "text-red-700"
+                    }`}>
+                    {messageText}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Email Input */}
+              <div>
+                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    placeholder="you@example.com"
+                    required
+                    disabled={loading}
+                    className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  />
+                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                    <i className="fas fa-envelope text-gray-400"></i>
                   </div>
                 </div>
+              </div>
 
-                <div className="form-group">
-                  <label htmlFor="password">
-                    <i className="fas fa-lock icon-left"></i>
-                    Password
-                  </label>
-                  <div className="input-with-icon">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      id="password"
-                      name="password"
-                      value={form.password}
-                      onChange={handleChange}
-                      placeholder="Enter your password"
-                      required
-                      disabled={loading}
-                      className="icon-input"
-                    />
-                    <button
-                      type="button"
-                      className="password-toggle"
-                      onClick={() => setShowPassword(!showPassword)}
-                      aria-label={showPassword ? "Hide password" : "Show password"}
-                      disabled={loading}
-                    >
-                      <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
-                    </button>
-                  </div>
-                </div>
-
-                <div className="form-options">
-                  <div className="remember-me">
-                    <input
-                      type="checkbox"
-                      id="remember"
-                      checked={rememberMe}
-                      onChange={(e) => setRememberMe(e.target.checked)}
-                      disabled={loading}
-                    />
-                    <label htmlFor="remember">Remember me</label>
+              {/* Password Input */}
+              <div>
+                <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    id="password"
+                    name="password"
+                    value={form.password}
+                    onChange={handleChange}
+                    placeholder="Enter your password"
+                    required
+                    disabled={loading}
+                    className="w-full px-4 py-3 pl-12 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  />
+                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                    <i className="fas fa-lock text-gray-400"></i>
                   </div>
                   <button
                     type="button"
-                    className="forgot-password-btn"
-                    onClick={handleForgotPassword}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                     disabled={loading}
                   >
-                    Forgot password?
+                    <i className={`fas ${showPassword ? "fa-eye" : "fa-eye-slash"}`}></i>
                   </button>
                 </div>
+              </div>
 
-                {error && (
-                  <div className={`alert-message ${getMessageType(error)}`}>
-                    <i className={`fas ${getMessageType(error) === "success" ? "fa-check-circle" :
-                      getMessageType(error) === "info" ? "fa-info-circle" : "fa-exclamation-circle"}`}></i>
-                    <span>{getMessageText(error)}</span>
-                  </div>
-                )}
-
-                <button
-                  type="submit"
+              {/* Options Row */}
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="remember"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    disabled={loading}
+                    className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary/50"
+                  />
+                  <label htmlFor="remember" className="ml-2 text-sm text-gray-700">
+                    Remember me
+                  </label>
+                </div>
+                {/* <button
+                  type="button"
+                  onClick={handleForgotPassword}
                   disabled={loading}
-                  className={`btn login-btn ${loading ? "loading" : ""}`}
+                  className="text-sm text-primary hover:text-secondary font-medium transition-colors duration-300"
                 >
-                  {loading ? (
-                    <>
-                      <i className="fas fa-spinner fa-spin"></i>
-                      Signing in...
-                    </>
-                  ) : (
-                    <>
-                      <i className="fas fa-sign-in-alt"></i>
-                      Sign In
-                    </>
-                  )}
-                </button>
+                  Forgot password?
+                </button> */}
+              </div>
 
-                <div className="divider">
-                  <span>Or continue with</span>
-                </div>
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 hover:shadow-lg hover:translate-y-[-1px] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <i className="fas fa-spinner fa-spin"></i>
+                    Signing in...
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-sign-in-alt"></i>
+                    Sign In to Your Account
+                  </>
+                )}
+              </button>
 
-                <div className="social-login">
-                  <button
-                    type="button"
-                    className="social-btn google-btn"
-                    onClick={() => handleSocialLogin("Google")}
-                    disabled={loading}
+              {/* Security Note */}
+              <div className="flex items-center justify-center gap-2 text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
+                <span className="flex items-center gap-1">
+                  <i className="fas fa-check-circle text-primary"></i>
+                  <span>Secure login</span>
+                </span>
+                <span>•</span>
+                <span className="flex items-center gap-1">
+                  <i className="fas fa-bolt text-primary"></i>
+                  <span>Fast access</span>
+                </span>
+                <span>•</span>
+                <span className="flex items-center gap-1">
+                  <i className="fas fa-headset text-primary"></i>
+                  <span>24/7 support</span>
+                </span>
+
+              </div>
+
+              {/* Register Link */}
+              <div className="text-center pt-4 border-t border-gray-200">
+                <p className="text-gray-600">
+                  Don't have an account?{" "}
+                  <Link
+                    to="/register"
+                    className="text-primary hover:text-secondary font-semibold transition-colors duration-300"
                   >
-                    <i className="fab fa-google"></i>
-                    Google
-                  </button>
-                  <button
-                    type="button"
-                    className="social-btn github-btn"
-                    onClick={() => handleSocialLogin("GitHub")}
-                    disabled={loading}
-                  >
-                    <i className="fab fa-github"></i>
-                    GitHub
-                  </button>
-                </div>
-
-                <div className="register-link">
-                  <p>
-                    Don't have an account?{" "}
-                    <Link to="/register" className="register-now">
-                      Sign up now
-                    </Link>
-                  </p>
-                </div>
-              </form>
-            </div>
-
-            {/* Right Column - Features Preview */}
-            <div className="login-preview">
-              <div className="preview-header">
-                <h3><i className="fas fa-star"></i> Why Login?</h3>
-                <p className="preview-subtitle">Unlock premium features</p>
+                    Sign up now
+                  </Link>
+                </p>
               </div>
-
-              <div className="features-list">
-                <div className="feature-item">
-                  <div className="feature-icon">
-                    <i className="fas fa-save"></i>
-                  </div>
-                  <div className="feature-content">
-                    <h4>Save Your Work</h4>
-                    <p>Store and access your generated ID cards anytime</p>
-                  </div>
-                </div>
-
-                <div className="feature-item">
-                  <div className="feature-icon">
-                    <i className="fas fa-history"></i>
-                  </div>
-                  <div className="feature-content">
-                    <h4>Access History</h4>
-                    <p>View and manage previously created cards</p>
-                  </div>
-                </div>
-
-                <div className="feature-item">
-                  <div className="feature-icon">
-                    <i className="fas fa-bolt"></i>
-                  </div>
-                  <div className="feature-content">
-                    <h4>Quick Templates</h4>
-                    <p>Use saved templates for faster generation</p>
-                  </div>
-                </div>
-
-                <div className="feature-item">
-                  <div className="feature-icon">
-                    <i className="fas fa-shield-alt"></i>
-                  </div>
-                  <div className="feature-content">
-                    <h4>Secure Storage</h4>
-                    <p>Your data is encrypted and protected</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="security-note">
-                <i className="fas fa-shield"></i>
-                <span>Your login information is securely encrypted</span>
-              </div>
-            </div>
+            </form>
           </div>
-        </section>
+
+        </div>
       </main>
 
-      <Footer />
     </div>
   );
 }
