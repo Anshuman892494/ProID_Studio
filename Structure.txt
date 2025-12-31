@@ -21,9 +21,11 @@ ProID_Studio/
 │   │   │   ├── Footer.jsx
 │   │   │   ├── Header.jsx         
 │   │   │   └── ProtectedRoute.jsx 
-│   │   ├── pages/         # Page components
+│   │   ├── pages/              # Page components
 │   │   │   ├── Dashboard.jsx
 │   │   │   ├── GenerateID.jsx
+│   │   │   ├── HelpSupport.jsx
+│   │   │   ├── Home.jsx
 │   │   │   ├── ContactUs.jsx
 │   │   │   ├── About.jsx
 │   │   │   ├── PrivacyPolicy.jsx
@@ -31,11 +33,9 @@ ProID_Studio/
 │   │   │   ├── Login.jsx
 │   │   │   ├── Register.jsx         
 │   │   │   └── UpdatePassword.jsx
-│   │   ├── services/      # API services
-│   │   ├── styles/        # CSS styles
-│   │   ├── App.js         # Main App component
-│   │   ├── index.css         
-│   │   └── index.js       # Entry point
+│   │   ├── App.js              # Main App component
+│   │   ├── index.css           # Main CSS file
+│   │   └── index.js            # Entry point
 |   ├── tailwind.config.js
 │   └── package.json
 │

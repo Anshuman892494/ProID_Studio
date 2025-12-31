@@ -6,11 +6,143 @@
   <link rel="icon" href="favicon.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ProID Studio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../src/index.css">
+  <style>
+    .preloader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 9999;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    .preloader-hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+  </style>
+
 </head>
 
-<body>
-  <noscript>You need to enable JavaScript to run this app.</noscript>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100">
+  <!-- NoScript Fallback -->
+  <noscript>
+    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 to-secondary/10 p-4">
+      <div class="max-w-md bg-white rounded-2xl shadow-xl p-8 text-center">
+        <div
+          class="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <i class="fas fa-id-card text-white text-3xl"></i>
+        </div>
+        <h1 class="text-2xl font-bold text-primary mb-4">JavaScript Required</h1>
+        <p class="text-gray-600 mb-6">
+          ProID Studio requires JavaScript to function properly. Please enable JavaScript in your browser settings to
+          continue.
+        </p>
+        <button onclick="window.location.reload()"
+          class="bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300 hover:shadow-lg">
+          Refresh Page
+        </button>
+      </div>
+    </div>
+  </noscript>
+
+  <!-- Preloader -->
+  <div id="preloader"
+    class="preloader bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col items-center justify-center">
+    <div class="max-w-md text-center animate-fade-in">
+      <!-- Logo -->
+      <div class="w-24 h-24 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-lg">
+        <i class="fas fa-id-card text-white text-4xl"></i>
+      </div>
+
+      <!-- Title -->
+      <h1 class="text-primary text-3xl md:text-4xl font-bold mb-4">
+        ProID Studio
+      </h1>
+
+      <!-- Tagline -->
+      <p class="text-gray-600 text-lg mb-8 max-w-sm mx-auto">
+        Professional ID Card Solutions
+      </p>
+
+      <!-- Loading dots -->
+      <div class="flex justify-center gap-2 mb-8">
+        <div class="w-3 h-3 bg-primary rounded-full animate-pulse-custom"></div>
+        <div class="w-3 h-3 bg-primary rounded-full animate-pulse-custom animation-delay-200"></div>
+        <div class="w-3 h-3 bg-primary rounded-full animate-pulse-custom animation-delay-400"></div>
+      </div>
+
+    </div>
+
+    <!-- Footer note -->
+    <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-xs text-gray-400">
+      Version 2.1.0 • Professional ID Solutions
+    </div>
+  </div>
+
+  <!-- React Root -->
   <div id="root"></div>
+
+  <script>
+    // Handle preloader
+    window.addEventListener('load', function () {
+      const preloader = document.getElementById('preloader');
+
+      // Add fade out class after a short delay
+      setTimeout(() => {
+        if (preloader) {
+          preloader.classList.add('preloader-hidden');
+        }
+      }, 1000);
+
+      // Remove from DOM after animation completes
+      setTimeout(() => {
+        if (preloader) {
+          preloader.style.display = 'none';
+        }
+      }, 1500);
+    });
+
+    // Handle loading errors
+    window.addEventListener('error', function (e) {
+      const preloader = document.getElementById('preloader');
+      if (preloader) {
+        preloader.innerHTML = `
+          <div class="max-w-md text-center p-8">
+            <div class="w-20 h-20 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <i class="fas fa-exclamation-triangle text-white text-3xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Loading Failed</h2>
+            <p class="text-gray-600 mb-6">
+              Failed to load the application. Please check your internet connection and try again.
+            </p>
+            <button onclick="window.location.reload()" class="bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300 hover:shadow-lg">
+              <i class="fas fa-redo mr-2"></i>Retry Loading
+            </button>
+          </div>
+        `;
+        preloader.classList.remove('preloader-hidden');
+      }
+    });
+
+    // Optional: Add CSS variables for your colors if using CDN
+    document.addEventListener('DOMContentLoaded', function () {
+      const style = document.createElement('style');
+      style.textContent = `
+        :root {
+          --primary: #04675b;
+          --secondary: #09758a;
+          --accent: #f72585;
+          --success: #1ee5ff;
+        }
+      `;
+      document.head.appendChild(style);
+    });
+  </script>
 </body>
 
 </html>

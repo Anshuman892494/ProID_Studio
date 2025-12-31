@@ -30,12 +30,6 @@ export default function ContactUs() {
         { icon: "fa-clock", title: "Support Hours", value: "Monday - Friday: 9 AM - 6 PM \nWeekends: 10 AM - 4 PM " }
     ];
 
-    const faqs = [
-        { question: "How long does it take to generate an ID card?", answer: "Most ID cards are generated instantly. Bulk generation for multiple cards may take 1-5 minutes depending on quantity." },
-        { question: "What file formats are supported for upload?", answer: "We support JPG, PNG, and GIF files for photos. Maximum file size is 5MB." },
-        { question: "Do you offer custom template design?", answer: "Yes! Contact our business team for custom template design services tailored to your organization's needs." },
-    ];
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setForm(prev => ({ ...prev, [name]: value }));
@@ -303,27 +297,6 @@ export default function ContactUs() {
                                 </form>
                             </div>
 
-                            {/* FAQ Section */}
-                            <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8">
-                                <h2 className="text-xl font-bold text-primary mb-6">Frequently Asked Questions</h2>
-
-                                <div className="space-y-4">
-                                    {faqs.map((faq, index) => (
-                                        <div key={index} className="border border-gray-200 rounded-lg overflow-hidden">
-                                            <details className="group">
-                                                <summary className="flex items-center justify-between p-4 cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors duration-300">
-                                                    <span className="font-semibold text-gray-800">{faq.question}</span>
-                                                    <i className="fas fa-chevron-down text-gray-400 group-open:rotate-180 transition-transform duration-300"></i>
-                                                </summary>
-                                                <div className="p-4 border-t border-gray-200">
-                                                    <p className="text-gray-700">{faq.answer}</p>
-                                                </div>
-                                            </details>
-                                        </div>
-                                    ))}
-                                </div>
-
-                            </div>
                         </div>
                     </div>
                 </div>

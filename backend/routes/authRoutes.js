@@ -130,7 +130,7 @@ router.post("/login", async (req, res) => {
         email: user.email,
         role: user.role
       },
-      process.env.JWT_SECRET || "your_jwt_secret_key",
+      process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
 
