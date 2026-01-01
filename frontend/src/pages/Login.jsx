@@ -287,9 +287,20 @@ export default function Login() {
                   </Link>
                 </p>
               </div>
+
+              {/* Register Link */}
+              <div className="text-center pt-4 border-t border-gray-200">
+                <Link
+                  to="/verify-email"
+                  state={{ email: form.email }}
+                  className="text-primary hover:text-secondary font-semibold transition-colors duration-300"
+                >
+                  Verify Email
+                </Link>
+              </div>
+
             </form>
           </div>
-
         </div>
       </main>
 

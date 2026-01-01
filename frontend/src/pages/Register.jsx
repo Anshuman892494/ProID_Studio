@@ -13,9 +13,11 @@ export default function Register() {
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
     const [agreed, setAgreed] = useState(false);
     const [passwordStrength, setPasswordStrength] = useState(0);
     const [phoneError, setPhoneError] = useState("");
+    const [showVerificationMessage, setShowVerificationMessage] = useState(false);
     const navigate = useNavigate();
 
     // Check if user is already logged in
@@ -84,15 +86,17 @@ export default function Register() {
         }
 
         setError("");
+        setSuccessMessage("");
     };
 
     const validateForm = () => {
         // Clear previous errors
         setError("");
+        setSuccessMessage("");
 
         // Email validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const allowedDomains = ["gmail.com", "outlook.com", "yahoo.com"];
+        const emailRegex = /^[^\s@]+@gmail\.com$/;
+        const allowedDomains = ["gmail.com"];
 
         // Name validation
         if (!form.name.trim()) {
@@ -109,7 +113,7 @@ export default function Register() {
         // Domain check
         const emailDomain = form.email.split("@")[1];
         if (!emailDomain || !allowedDomains.includes(emailDomain)) {
-            setError("Please use a valid email provider (gmail, outlook, yahoo)");
+            setError("Please use a valid gmail");
             return false;
         }
 
@@ -149,6 +153,8 @@ export default function Register() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
+        setSuccessMessage("");
+        setShowVerificationMessage(false);
 
         if (!validateForm()) return;
 
@@ -179,19 +185,46 @@ export default function Register() {
             const data = await response.json();
 
             if (response.ok && data.success) {
-                // Store token if returned
-                if (data.token) {
+                if (data.requiresEmailVerification) {
+                    // Show verification message instead of redirecting to dashboard
+                    setShowVerificationMessage(true);
+                    setSuccessMessage(
+                        `Registration successful! Please check your email (${form.email}) for verification instructions.`
+                    );
+
+                    // Clear form
+                    setForm({
+                        name: "",
+                        email: "",
+                        password: "",
+                        confirmPassword: "",
+                        organization: "",
+                        phone: ""
+                    });
+                    setAgreed(false);
+
+                    // Optionally redirect to login after delay
+                    setTimeout(() => {
+                        navigate("/login");
+                    }, 5000);
+                } else if (data.token) {
+                    // If no email verification required, log in directly
                     localStorage.setItem("token", data.token);
                     localStorage.setItem("user", JSON.stringify(data.user));
+
+                    setSuccessMessage("Registration successful! Redirecting to dashboard...");
+
+                    // Redirect to dashboard after delay
+                    setTimeout(() => {
+                        navigate("/dashboard");
+                    }, 1500);
+                } else {
+                    // Fallback: redirect to login
+                    setSuccessMessage("Registration successful! Redirecting to login...");
+                    setTimeout(() => {
+                        navigate("/login");
+                    }, 1500);
                 }
-
-                // Show success message
-                setError("success:Registration successful! Redirecting to login...");
-
-                // Redirect to login page after delay
-                setTimeout(() => {
-                    navigate("/login");
-                }, 1500);
             } else {
                 setError(data.message || "Registration failed");
             }
@@ -209,9 +242,33 @@ export default function Register() {
         return "bg-green-500";
     };
 
+    // Handler for resending verification email
+    const handleResendVerification = async () => {
+        try {
+            const response = await fetch(
+                `${process.env.REACT_APP_API_URL || "http://localhost:5050"}/api/auth/resend-verification`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ email: form.email }),
+                }
+            );
+
+            const data = await response.json();
+            if (response.ok && data.success) {
+                setSuccessMessage("Verification email sent successfully! Please check your inbox.");
+            } else {
+                setError(data.message || "Failed to resend verification email");
+            }
+        } catch (err) {
+            setError("Network error! Please try again.");
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-
             <main className="container mx-auto px-4 py-8">
                 {/* Main Container */}
                 <div className="max-w-2xl mx-auto animate-fade-in">
@@ -227,288 +284,357 @@ export default function Register() {
 
                     {/* Registration Form */}
                     <div className="bg-white rounded-2xl shadow-xl p-8">
-
-                        {/* Status Message */}
-                        {error && (
-                            <div className={`mb-6 p-4 rounded-lg ${error.startsWith("success:") ? "bg-green-50 border border-green-200" :
-                                "bg-red-50 border border-red-200"
-                                }`}>
+                        {/* Success Message */}
+                        {successMessage && (
+                            <div className="mb-6 p-4 rounded-lg bg-green-50 border border-green-200">
                                 <div className="flex items-start gap-3">
-                                    <i className={`fas ${error.startsWith("success:") ? "fa-check-circle text-green-500" :
-                                        "fa-exclamation-circle text-red-500"
-                                        } mt-0.5`}></i>
-                                    <span className={`text-sm ${error.startsWith("success:") ? "text-green-700" :
-                                        "text-red-700"
-                                        }`}>
-                                        {error.replace("success:", "")}
+                                    <i className="fas fa-check-circle text-green-500 mt-0.5"></i>
+                                    <div className="flex-1">
+                                        <span className="text-sm text-green-700">
+                                            {successMessage}
+                                        </span>
+                                        {showVerificationMessage && (
+                                            <div className="mt-2">
+                                                <button
+                                                    onClick={handleResendVerification}
+                                                    className="text-sm text-primary hover:text-secondary font-medium"
+                                                >
+                                                    Didn't receive email? Click to resend
+                                                </button>
+                                                <p className="text-xs text-gray-600 mt-1">
+                                                    After verification, you can login to access the dashboard.
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Error Message */}
+                        {error && !successMessage && (
+                            <div className="mb-6 p-4 rounded-lg bg-red-50 border border-red-200">
+                                <div className="flex items-start gap-3">
+                                    <i className="fas fa-exclamation-circle text-red-500 mt-0.5"></i>
+                                    <span className="text-sm text-red-700">
+                                        {error}
                                     </span>
                                 </div>
                             </div>
                         )}
 
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            {/* Name and Email */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
-                                        Full Name *
-                                    </label>
-                                    <div className="relative">
-                                        <input
-                                            id="name"
-                                            name="name"
-                                            type="text"
-                                            value={form.name}
-                                            onChange={handleChange}
-                                            placeholder="Enter your full name"
-                                            required
-                                            disabled={loading}
-                                            autoComplete="off"
-                                            className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                                        />
-                                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                                            <i className="fas fa-user text-gray-400"></i>
+                        {/* Only show form if not showing verification message */}
+                        {!showVerificationMessage && (
+                            <form onSubmit={handleSubmit} className="space-y-6">
+                                {/* ... (rest of your form fields remain exactly the same) ... */}
+
+                                {/* Name and Email */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
+                                            Full Name *
+                                        </label>
+                                        <div className="relative">
+                                            <input
+                                                id="name"
+                                                name="name"
+                                                type="text"
+                                                value={form.name}
+                                                onChange={handleChange}
+                                                placeholder="Enter your full name"
+                                                required
+                                                disabled={loading}
+                                                autoComplete="off"
+                                                className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                            />
+                                            <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                                                <i className="fas fa-user text-gray-400"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                                            Email Address *
+                                        </label>
+                                        <div className="relative">
+                                            <input
+                                                id="email"
+                                                name="email"
+                                                type="email"
+                                                value={form.email}
+                                                onChange={handleChange}
+                                                placeholder="you@example.com"
+                                                required
+                                                disabled={loading}
+                                                autoComplete="off"
+                                                autoCorrect="off"
+                                                autoCapitalize="none"
+                                                spellCheck="false"
+                                                className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                            />
+                                            <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                                                <i className="fas fa-envelope text-gray-400"></i>
+                                            </div>
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-1">
+                                            Use gmail, outlook, or yahoo email
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Password Fields */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+                                            Password *
+                                        </label>
+                                        <div className="relative">
+                                            <input
+                                                id="password"
+                                                name="password"
+                                                type="password"
+                                                value={form.password}
+                                                onChange={handleChange}
+                                                placeholder="Create a strong password"
+                                                required
+                                                disabled={loading}
+                                                autoComplete="new-password"
+                                                className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                            />
+                                            <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                                                <i className="fas fa-lock text-gray-400"></i>
+                                            </div>
+                                        </div>
+
+                                        {/* Password Strength Indicator */}
+                                        {form.password && (
+                                            <div className="mt-2">
+                                                <div className="flex justify-between text-xs text-gray-600 mb-1">
+                                                    <span>Password strength:</span>
+                                                    <span className="font-medium">
+                                                        {passwordStrength <= 2 ? "Weak" : passwordStrength <= 3 ? "Good" : "Strong"}
+                                                    </span>
+                                                </div>
+                                                <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                                    <div
+                                                        className={`h-full ${getPasswordStrengthColor(passwordStrength)} transition-all duration-300`}
+                                                        style={{ width: `${(passwordStrength / 5) * 100}%` }}
+                                                    ></div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div>
+                                        <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 mb-2">
+                                            Confirm Password *
+                                        </label>
+                                        <div className="relative">
+                                            <input
+                                                id="confirmPassword"
+                                                name="confirmPassword"
+                                                type="password"
+                                                value={form.confirmPassword}
+                                                onChange={handleChange}
+                                                placeholder="Confirm your password"
+                                                required
+                                                disabled={loading}
+                                                autoComplete="new-password"
+                                                className={`w-full px-4 py-3 pl-12 border rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed 
+                                                    ${form.confirmPassword
+                                                        ? form.password === form.confirmPassword
+                                                            ? 'border-green-300'
+                                                            : 'border-red-300'
+                                                        : 'border-gray-300'
+                                                    }`}
+                                            />
+                                            <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                                                <i className="fas fa-lock text-gray-400"></i>
+                                            </div>
+                                            {form.confirmPassword && form.password === form.confirmPassword && (
+                                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                                    <i className="fas fa-check text-green-500"></i>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
-                                        Email Address *
-                                    </label>
-                                    <div className="relative">
-                                        <input
-                                            id="email"
-                                            name="email"
-                                            type="email"
-                                            value={form.email}
-                                            onChange={handleChange}
-                                            placeholder="you@example.com"
-                                            required
-                                            disabled={loading}
-                                            autoComplete="off"
-                                            autoCorrect="off"
-                                            autoCapitalize="none"
-                                            spellCheck="false"
-                                            className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                                        />
-                                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                                            <i className="fas fa-envelope text-gray-400"></i>
+                                {/* Organization and Phone */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label htmlFor="organization" className="block text-sm font-semibold text-gray-700 mb-2">
+                                            Organization
+                                        </label>
+                                        <div className="relative">
+                                            <input
+                                                id="organization"
+                                                name="organization"
+                                                type="text"
+                                                value={form.organization}
+                                                onChange={handleChange}
+                                                placeholder="Your company/school name"
+                                                disabled={loading}
+                                                autoComplete="off"
+                                                className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                            />
+                                            <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                                                <i className="fas fa-building text-gray-400"></i>
+                                            </div>
                                         </div>
                                     </div>
-                                    <p className="text-xs text-gray-500 mt-1">
-                                        Use gmail, outlook, or yahoo email
+
+                                    <div>
+                                        <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
+                                            Phone Number
+                                        </label>
+                                        <div className="relative">
+                                            <input
+                                                id="phone"
+                                                name="phone"
+                                                type="tel"
+                                                value={form.phone}
+                                                onChange={handleChange}
+                                                placeholder="Enter your phone number"
+                                                disabled={loading}
+                                                autoComplete="off"
+                                                maxLength={10}
+                                                className={`w-full px-4 py-3 pl-12 border rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed 
+                                                    ${phoneError ? 'border-red-300'
+                                                        : form.phone && !phoneError
+                                                            ? 'border-green-300'
+                                                            : 'border-gray-300'
+                                                    }`}
+                                            />
+                                            <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                                                <i className="fas fa-phone text-gray-400"></i>
+                                            </div>
+                                            {form.phone && !phoneError && form.phone.length === 10 && (
+                                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                                    <i className="fas fa-check text-green-500"></i>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Phone validation messages */}
+                                        {phoneError && (
+                                            <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                                                <i className="fas fa-exclamation-circle"></i>
+                                                {phoneError}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Terms Agreement */}
+                                <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+                                    <input
+                                        type="checkbox"
+                                        id="agree"
+                                        checked={agreed}
+                                        onChange={(e) => setAgreed(e.target.checked)}
+                                        disabled={loading}
+                                        className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary/50 mt-1 flex-shrink-0"
+                                    />
+                                    <label htmlFor="agree" className="text-sm text-gray-700">
+                                        I agree to the{" "}
+                                        <Link to="/terms" className="text-primary hover:text-secondary font-medium">
+                                            Terms of Service
+                                        </Link>{" "}
+                                        and{" "}
+                                        <Link to="/privacy" className="text-primary hover:text-secondary font-medium">
+                                            Privacy Policy
+                                        </Link>
+                                        . I understand that my data will be processed in accordance with these policies.
+                                    </label>
+                                </div>
+
+                                {/* Submit Button */}
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="w-full bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 hover:shadow-lg hover:translate-y-[-1px] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                >
+                                    {loading ? (
+                                        <>
+                                            <i className="fas fa-spinner fa-spin"></i>
+                                            Creating Account...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <i className="fas fa-user-plus"></i>
+                                            Create Account
+                                        </>
+                                    )}
+                                </button>
+
+                                {/* Security Note */}
+                                <div className="flex items-center justify-center gap-2 text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
+                                    <i className="fas fa-shield-alt text-primary"></i>
+                                    <span>Your information is secured with industry-standard encryption</span>
+                                </div>
+
+                                {/* Login Link */}
+                                <div className="text-center pt-4 border-t border-gray-200">
+                                    <p className="text-gray-600">
+                                        Already have an account?{" "}
+                                        <Link
+                                            to="/login"
+                                            className="text-primary hover:text-secondary font-semibold transition-colors duration-300"
+                                        >
+                                            Sign in here
+                                        </Link>
                                     </p>
                                 </div>
-                            </div>
+                            </form>
+                        )}
 
-                            {/* Password Fields */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
-                                        Password *
-                                    </label>
-                                    <div className="relative">
-                                        <input
-                                            id="password"
-                                            name="password"
-                                            type="password"
-                                            value={form.password}
-                                            onChange={handleChange}
-                                            placeholder="Create a strong password"
-                                            required
-                                            disabled={loading}
-                                            autoComplete="new-password"
-                                            className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                                        />
-                                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                                            <i className="fas fa-lock text-gray-400"></i>
-                                        </div>
-                                    </div>
-
-                                    {/* Password Strength Indicator */}
-                                    {form.password && (
-                                        <div className="mt-2">
-                                            <div className="flex justify-between text-xs text-gray-600 mb-1">
-                                                <span>Password strength:</span>
-                                                <span className="font-medium">
-                                                    {passwordStrength <= 2 ? "Weak" : passwordStrength <= 3 ? "Good" : "Strong"}
-                                                </span>
-                                            </div>
-                                            <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                                                <div
-                                                    className={`h-full ${getPasswordStrengthColor(passwordStrength)} transition-all duration-300`}
-                                                    style={{ width: `${(passwordStrength / 5) * 100}%` }}
-                                                ></div>
-                                            </div>
-                                        </div>
-                                    )}
+                        {/* Verification Instructions (shown after successful registration with email verification) */}
+                        {showVerificationMessage && (
+                            <div className="text-center py-8">
+                                <div className="mb-6">
+                                    <i className="fas fa-envelope-open-text text-5xl text-primary mb-4"></i>
+                                    <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                                        Verify Your Email
+                                    </h3>
+                                    <p className="text-gray-600">
+                                        We've sent a verification link to <span className="font-medium">{form.email}</span>
+                                    </p>
                                 </div>
-
-                                <div>
-                                    <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 mb-2">
-                                        Confirm Password *
-                                    </label>
-                                    <div className="relative">
-                                        <input
-                                            id="confirmPassword"
-                                            name="confirmPassword"
-                                            type="password"
-                                            value={form.confirmPassword}
-                                            onChange={handleChange}
-                                            placeholder="Confirm your password"
-                                            required
-                                            disabled={loading}
-                                            autoComplete="new-password"
-                                            className={`w-full px-4 py-3 pl-12 border rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed 
-                                                ${form.confirmPassword
-                                                    ? form.password === form.confirmPassword
-                                                        ? 'border-green-300'
-                                                        : 'border-red-300'
-                                                    : 'border-gray-300'
-                                                }`}
-                                        />
-                                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                                            <i className="fas fa-lock text-gray-400"></i>
-                                        </div>
-                                        {form.confirmPassword && form.password === form.confirmPassword && (
-                                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                                <i className="fas fa-check text-green-500"></i>
-                                            </div>
-                                        )}
-                                    </div>
+                                <div className="bg-blue-50 p-4 rounded-lg mb-6">
+                                    <h4 className="font-medium text-blue-800 mb-2">Next Steps:</h4>
+                                    <ul className="text-left text-blue-700 text-sm space-y-1">
+                                        <li className="flex items-start gap-2">
+                                            <i className="fas fa-check-circle text-green-500 mt-0.5"></i>
+                                            <span>Check your email inbox (and spam folder)</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                            <i className="fas fa-check-circle text-green-500 mt-0.5"></i>
+                                            <span>Click the verification link in the email</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                            <i className="fas fa-check-circle text-green-500 mt-0.5"></i>
+                                            <span>Return here to login with your verified account</span>
+                                        </li>
+                                    </ul>
                                 </div>
-                            </div>
-
-                            {/* Organization and Phone */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label htmlFor="organization" className="block text-sm font-semibold text-gray-700 mb-2">
-                                        Organization
-                                        {/* <span className="text-gray-500 text-xs font-normal ml-1">(Optional)</span> */}
-                                    </label>
-                                    <div className="relative">
-                                        <input
-                                            id="organization"
-                                            name="organization"
-                                            type="text"
-                                            value={form.organization}
-                                            onChange={handleChange}
-                                            placeholder="Your company/school name"
-                                            disabled={loading}
-                                            autoComplete="off"
-                                            className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                                        />
-                                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                                            <i className="fas fa-building text-gray-400"></i>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
-                                        Phone Number
-                                    </label>
-                                    <div className="relative">
-                                        <input
-                                            id="phone"
-                                            name="phone"
-                                            type="tel"
-                                            value={form.phone}
-                                            onChange={handleChange}
-                                            placeholder="Enter your phone number"
-                                            disabled={loading}
-                                            autoComplete="off"
-                                            maxLength={10}
-                                            className={`w-full px-4 py-3 pl-12 border rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed 
-                                                ${phoneError ? 'border-red-300'
-                                                    : form.phone && !phoneError
-                                                        ? 'border-gray-300'
-                                                        : 'border-gray-300'
-                                                }`}
-                                        />
-                                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                                            <i className="fas fa-phone text-gray-400"></i>
-                                        </div>
-                                        {form.phone && !phoneError && form.phone.length === 10 && (
-                                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                                <i className="fas fa-check text-green-500"></i>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Phone validation messages */}
-                                    {phoneError && (
-                                        <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
-                                            <i className="fas fa-exclamation-circle"></i>
-                                            {phoneError}
-                                        </p>
-                                    )}
-
-                                </div>
-                            </div>
-
-                            {/* Terms Agreement */}
-                            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
-                                <input
-                                    type="checkbox"
-                                    id="agree"
-                                    checked={agreed}
-                                    onChange={(e) => setAgreed(e.target.checked)}
-                                    disabled={loading}
-                                    className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary/50 mt-1 flex-shrink-0"
-                                />
-                                <label htmlFor="agree" className="text-sm text-gray-700">
-                                    I agree to the{" "}
-                                    <Link to="/terms" className="text-primary hover:text-secondary font-medium">
-                                        Terms of Service
-                                    </Link>{" "}
-                                    and{" "}
-                                    <Link to="/privacy" className="text-primary hover:text-secondary font-medium">
-                                        Privacy Policy
-                                    </Link>
-                                    . I understand that my data will be processed in accordance with these policies.
-                                </label>
-                            </div>
-
-                            {/* Submit Button */}
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 hover:shadow-lg hover:translate-y-[-1px] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                            >
-                                {loading ? (
-                                    <>
-                                        <i className="fas fa-spinner fa-spin"></i>
-                                        Creating Account...
-                                    </>
-                                ) : (
-                                    <>
-                                        <i className="fas fa-user-plus"></i>
-                                        Create Account
-                                    </>
-                                )}
-                            </button>
-
-                            {/* Security Note */}
-                            <div className="flex items-center justify-center gap-2 text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
-                                <i className="fas fa-shield-alt text-primary"></i>
-                                <span>Your information is secured with industry-standard encryption</span>
-                            </div>
-
-                            {/* Login Link */}
-                            <div className="text-center pt-4 border-t border-gray-200">
-                                <p className="text-gray-600">
-                                    Already have an account?{" "}
-                                    <Link
-                                        to="/login"
-                                        className="text-primary hover:text-secondary font-semibold transition-colors duration-300"
+                                <div className="flex flex-col gap-3">
+                                    <button
+                                        onClick={handleResendVerification}
+                                        className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors"
                                     >
-                                        Sign in here
-                                    </Link>
-                                </p>
+                                        Resend Verification Email
+                                    </button>
+                                    <button
+                                        onClick={() => navigate("/login")}
+                                        className="px-4 py-2 border border-primary text-primary rounded-lg hover:bg-primary/10 transition-colors"
+                                    >
+                                        Go to Login Page
+                                    </button>
+                                </div>
                             </div>
-                        </form>
+                        )}
                     </div>
                 </div>
             </main>

@@ -42,11 +42,11 @@ export default function Header() {
                         {/* Desktop Navigation */}
                         <nav className="hidden md:block">
                             <ul className="flex items-center gap-4 lg:gap-6">
-                                {/* <li>
+                                <li>
                                     <Link to="/" className="font-semibold text-gray-800 hover:text-primary hover:bg-primary/10 px-3 py-2 rounded transition-all duration-300">
                                         Home
                                     </Link>
-                                </li> */}
+                                </li>
 
                                 {isLoggedIn ? (
                                     <>

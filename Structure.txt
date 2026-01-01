@@ -3,9 +3,13 @@ ProID_Studio/
 ├── backend/
 │   ├── src/
 │   │   ├── config/             # Database configuration
+│   │   │   ├── EmailTemplate.js    
 │   │   │   └── db.js
 │   │   ├── models/             # MongoDB schemas
 │   │   │   └── User.js
+│   │   ├── middleware/             # Middlewares
+│   │   │   ├── Email.js
+│   │   │   └── Emailconfig.js
 │   │   └── routes/             # API routes
 │   │       └── authRoute.js
 │   ├── server.js               # Main server file
@@ -21,22 +25,27 @@ ProID_Studio/
 │   │   │   ├── Footer.jsx
 │   │   │   ├── Header.jsx         
 │   │   │   └── ProtectedRoute.jsx 
-│   │   ├── pages/              # Page components
+│   │   ├── pages/                    # Page components
+│   │   │   │   ├── home/                 # Home components
+│   │   │   │   │   ├── AfterLoginHome.jsx         
+│   │   │   │   │   └── BeforeLoginHome.jsx
+│   │   │   │   └── Other/                 # Other components
+│   │   │   │       ├── HelpSupport.jsx    
+│   │   │   │       ├── PrivacyPolicy.jsx    
+│   │   │   │       ├── NotFound404.jsx
+│   │   │   │       ├── About.jsx    
+│   │   │   │       ├── ContactUs.jsx   
+│   │   │   │       ├── TermsOfService.jsx
+│   │   │   │       ├── UpdatePassword.jsx
+│   │   │   │       └── VerifyEmail.jsx
 │   │   │   ├── Dashboard.jsx
 │   │   │   ├── GenerateID.jsx
-│   │   │   ├── HelpSupport.jsx
-│   │   │   ├── Home.jsx
-│   │   │   ├── ContactUs.jsx
-│   │   │   ├── About.jsx
-│   │   │   ├── PrivacyPolicy.jsx
-│   │   │   ├── TermsOfService.jsx
 │   │   │   ├── Login.jsx
-│   │   │   ├── Register.jsx         
-│   │   │   └── UpdatePassword.jsx
+│   │   │   └── Register.jsx
 │   │   ├── App.js              # Main App component
 │   │   ├── index.css           # Main CSS file
 │   │   └── index.js            # Entry point
-|   ├── tailwind.config.js
+│   ├── tailwind.config.js
 │   └── package.json
 │
 ├── .gitignore
