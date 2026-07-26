@@ -13,7 +13,7 @@ export default function Login() {
   useEffect(() => {
     const user = localStorage.getItem("user");
     if (user) {
-      navigate("/", { replace: true });
+      navigate("/dashboard", { replace: true });
     }
 
     // Check for saved credentials
@@ -85,11 +85,10 @@ export default function Login() {
           localStorage.setItem("token", data.token);
         }
 
-        // Show success message
-        setError("success:Login successful! Redirecting...");
+        setError("success:Login successful! Redirecting to Dashboard...");
         setTimeout(() => {
-          navigate("/", { replace: true });
-        }, 1500);
+          navigate("/dashboard", { replace: true });
+        }, 1000);
       } else {
         setError(data.error || data.message || "Login failed. Please check your credentials.");
       }
@@ -134,10 +133,10 @@ export default function Login() {
           </div>
 
           {/* Login Form */}
-          <div className="bg-white rounded-2xl shadow-xl p-8">
+          <div className="bg-white border border-gray-200 shadow-xl p-8">
             {/* Status Message */}
             {error && (
-              <div className={`mb-6 p-4 rounded-lg ${messageType === "success" ? "bg-green-50 border border-green-200" :
+              <div className={`mb-6 p-4 ${messageType === "success" ? "bg-green-50 border border-green-200" :
                 messageType === "info" ? "bg-blue-50 border border-blue-200" :
                   "bg-red-50 border border-red-200"
                 }`}>
@@ -172,7 +171,7 @@ export default function Login() {
                     placeholder="you@example.com"
                     required
                     disabled={loading}
-                    className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    className="w-full px-4 py-3 pl-12 border border-gray-300 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
                   />
                   <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
                     <i className="fas fa-envelope text-gray-400"></i>
@@ -195,7 +194,7 @@ export default function Login() {
                     placeholder="Enter your password"
                     required
                     disabled={loading}
-                    className="w-full px-4 py-3 pl-12 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    className="w-full px-4 py-3 pl-12 pr-12 border border-gray-300 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
                   />
                   <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
                     <i className="fas fa-lock text-gray-400"></i>
@@ -221,27 +220,19 @@ export default function Login() {
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
                     disabled={loading}
-                    className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary/50"
+                    className="w-4 h-4 text-primary border-gray-300 focus:ring-primary/50"
                   />
                   <label htmlFor="remember" className="ml-2 text-sm text-gray-700">
                     Remember me
                   </label>
                 </div>
-                {/* <button
-                  type="button"
-                  onClick={handleForgotPassword}
-                  disabled={loading}
-                  className="text-sm text-primary hover:text-secondary font-medium transition-colors duration-300"
-                >
-                  Forgot password?
-                </button> */}
               </div>
 
               {/* Submit Button */}
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 hover:shadow-lg hover:translate-y-[-1px] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary text-white font-semibold py-3 px-4 transition-all duration-300 hover:shadow-lg hover:translate-y-[-1px] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>
@@ -257,7 +248,7 @@ export default function Login() {
               </button>
 
               {/* Security Note */}
-              <div className="flex items-center justify-center gap-2 text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
+              <div className="flex items-center justify-center gap-2 text-sm text-gray-500 bg-gray-50 p-3">
                 <span className="flex items-center gap-1">
                   <i className="fas fa-check-circle text-primary"></i>
                   <span>Secure login</span>
@@ -286,17 +277,6 @@ export default function Login() {
                     Sign up now
                   </Link>
                 </p>
-              </div>
-
-              {/* Register Link */}
-              <div className="text-center pt-4 border-t border-gray-200">
-                <Link
-                  to="/verify-email"
-                  state={{ email: form.email }}
-                  className="text-primary hover:text-secondary font-semibold transition-colors duration-300"
-                >
-                  Verify Email
-                </Link>
               </div>
 
             </form>

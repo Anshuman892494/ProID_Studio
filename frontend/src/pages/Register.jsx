@@ -182,62 +182,19 @@ export default function Register() {
                 return;
             }
 
-            // CASE 1: Email verification required
-            if (data.requiresEmailVerification) {
-                setShowVerificationMessage(true);
-                setSuccessMessage(
-                    `Registration successful! Please verify your email (${form.email}) to continue.`
-                );
-
-                // Clear form
-                setForm({
-                    name: "",
-                    email: "",
-                    password: "",
-                    confirmPassword: "",
-                    organization: "",
-                    phone: ""
-                });
-                setAgreed(false);
-
-                // Redirect to /verify-email after 1.5s
-                setTimeout(() => {
-                    navigate("/verify-email", { state: { email: userData.email } });
-                }, 1500);
-
-                return;
-            }
-
-            // CASE 2: Token exists but user not verified
-            if (data.token && data.user && data.user.isVerified === false) {
+            // Save user session and navigate directly to dashboard
+            if (data.token && data.user) {
                 localStorage.setItem("token", data.token);
                 localStorage.setItem("user", JSON.stringify(data.user));
-
-                setSuccessMessage("Please verify your email to activate your account.");
-
-                setTimeout(() => {
-                    navigate("/verify-email", { state: { email: userData.email } });
-                }, 1500);
-
-                return;
             }
 
-            // CASE 3: Token exists and user is verified
-            if (data.token && data.user && data.user.isVerified === true) {
-                localStorage.setItem("token", data.token);
-                localStorage.setItem("user", JSON.stringify(data.user));
+            setSuccessMessage("Registration successful! Redirecting to dashboard...");
 
-                setSuccessMessage("Registration successful! Redirecting to dashboard...");
+            setTimeout(() => {
+                navigate("/dashboard");
+            }, 1000);
 
-                setTimeout(() => {
-                    navigate("/dashboard");
-                }, 1500);
-
-                return;
-            }
-
-            // Fallback: go to login page if something unexpected happens
-            navigate("/login");
+            return;
 
         } catch (err) {
             console.error("Registration error:", err);
@@ -295,29 +252,16 @@ export default function Register() {
                     </div>
 
                     {/* Registration Form */}
-                    <div className="bg-white rounded-2xl shadow-xl p-8">
+                    <div className="bg-white border border-gray-200 shadow-xl p-8">
                         {/* Success Message */}
                         {successMessage && (
-                            <div className="mb-6 p-4 rounded-lg bg-green-50 border border-green-200">
+                            <div className="mb-6 p-4 bg-green-50 border border-green-200">
                                 <div className="flex items-start gap-3">
                                     <i className="fas fa-check-circle text-green-500 mt-0.5"></i>
                                     <div className="flex-1">
                                         <span className="text-sm text-green-700">
                                             {successMessage}
                                         </span>
-                                        {showVerificationMessage && (
-                                            <div className="mt-2">
-                                                <button
-                                                    onClick={handleResendVerification}
-                                                    className="text-sm text-primary hover:text-secondary font-medium"
-                                                >
-                                                    Didn't receive email? Click to resend
-                                                </button>
-                                                <p className="text-xs text-gray-600 mt-1">
-                                                    After verification, you can login to access the dashboard.
-                                                </p>
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -325,7 +269,7 @@ export default function Register() {
 
                         {/* Error Message */}
                         {error && !successMessage && (
-                            <div className="mb-6 p-4 rounded-lg bg-red-50 border border-red-200">
+                            <div className="mb-6 p-4 bg-red-50 border border-red-200">
                                 <div className="flex items-start gap-3">
                                     <i className="fas fa-exclamation-circle text-red-500 mt-0.5"></i>
                                     <span className="text-sm text-red-700">
@@ -338,8 +282,6 @@ export default function Register() {
                         {/* Only show form if not showing verification message */}
                         {!showVerificationMessage && (
                             <form onSubmit={handleSubmit} className="space-y-6">
-                                {/* ... (rest of your form fields remain exactly the same) ... */}
-
                                 {/* Name and Email */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
@@ -357,7 +299,7 @@ export default function Register() {
                                                 required
                                                 disabled={loading}
                                                 autoComplete="off"
-                                                className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                                className="w-full px-4 py-3 pl-12 border border-gray-300 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
                                             />
                                             <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
                                                 <i className="fas fa-user text-gray-400"></i>
@@ -383,7 +325,7 @@ export default function Register() {
                                                 autoCorrect="off"
                                                 autoCapitalize="none"
                                                 spellCheck="false"
-                                                className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                                className="w-full px-4 py-3 pl-12 border border-gray-300 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
                                             />
                                             <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
                                                 <i className="fas fa-envelope text-gray-400"></i>
@@ -412,7 +354,7 @@ export default function Register() {
                                                 required
                                                 disabled={loading}
                                                 autoComplete="new-password"
-                                                className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                                className="w-full px-4 py-3 pl-12 border border-gray-300 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
                                             />
                                             <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
                                                 <i className="fas fa-lock text-gray-400"></i>
@@ -428,7 +370,7 @@ export default function Register() {
                                                         {passwordStrength <= 2 ? "Weak" : passwordStrength <= 3 ? "Good" : "Strong"}
                                                     </span>
                                                 </div>
-                                                <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                                <div className="h-1.5 bg-gray-200 overflow-hidden">
                                                     <div
                                                         className={`h-full ${getPasswordStrengthColor(passwordStrength)} transition-all duration-300`}
                                                         style={{ width: `${(passwordStrength / 5) * 100}%` }}
@@ -453,7 +395,7 @@ export default function Register() {
                                                 required
                                                 disabled={loading}
                                                 autoComplete="new-password"
-                                                className={`w-full px-4 py-3 pl-12 border rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed 
+                                                className={`w-full px-4 py-3 pl-12 border focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed 
                                                     ${form.confirmPassword
                                                         ? form.password === form.confirmPassword ? 'border-green-300' : 'border-red-300'
                                                         : 'border-gray-300'
@@ -487,7 +429,7 @@ export default function Register() {
                                                 placeholder="Your company/school name"
                                                 disabled={loading}
                                                 autoComplete="off"
-                                                className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                                className="w-full px-4 py-3 pl-12 border border-gray-300 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
                                             />
                                             <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
                                                 <i className="fas fa-building text-gray-400"></i>
@@ -510,7 +452,7 @@ export default function Register() {
                                                 disabled={loading}
                                                 autoComplete="off"
                                                 maxLength={10}
-                                                className={`w-full px-4 py-3 pl-12 border rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed 
+                                                className={`w-full px-4 py-3 pl-12 border focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed 
                                                     ${phoneError ? 'border-red-300'
                                                         : form.phone && !phoneError
                                                             ? 'border-green-300'
@@ -538,17 +480,15 @@ export default function Register() {
                                 </div>
 
                                 {/* Terms Agreement */}
-                                <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+                                <div className="flex items-start gap-3 p-4 bg-gray-50">
                                     <input
                                         type="checkbox"
                                         id="agree"
                                         checked={agreed}
                                         onChange={(e) => setAgreed(e.target.checked)}
                                         disabled={loading}
-                                        className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary/50 mt-1 flex-shrink-0"
+                                        className="w-4 h-4 text-primary border-gray-300 focus:ring-primary/50 mt-1 flex-shrink-0"
                                     />
-
-                                    {/* Button is valiading after checkbox (color chnage)  */}
 
                                     <label htmlFor="agree" className="text-sm text-gray-700">
                                         I agree to the{" "}
@@ -567,7 +507,7 @@ export default function Register() {
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="w-full bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 hover:shadow-lg hover:translate-y-[-1px] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                    className="w-full bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary text-white font-semibold py-3 px-4 transition-all duration-300 hover:shadow-lg hover:translate-y-[-1px] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                 >
                                     {loading ? (
                                         <>
@@ -583,7 +523,7 @@ export default function Register() {
                                 </button>
 
                                 {/* Security Note */}
-                                <div className="flex items-center justify-center gap-2 text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
+                                <div className="flex items-center justify-center gap-2 text-sm text-gray-500 bg-gray-50 p-3">
                                     <i className="fas fa-shield-alt text-primary"></i>
                                     <span>Your information is secured with industry-standard encryption</span>
                                 </div>

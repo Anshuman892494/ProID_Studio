@@ -57,15 +57,11 @@ router.post("/register", async (req, res) => {
       organization: organization || "",
       phone: phone || "",
       role: "user",
-      verificationCode,
-      verificationCodeExpiresAt,
-      isVerified: false,
+      isVerified: true,
       createdAt: new Date()
     });
 
     await user.save();
-
-    await SendVerificationCode(user.email, user.name, verificationCode);
 
     const token = jwt.sign(
       {
@@ -224,14 +220,6 @@ router.post("/login", async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({ success: false, message: "Invalid credentials" });
-    }
-
-    // Check if email is verified
-    if (!user.isVerified) {
-      return res.status(403).json({
-        success: false,
-        message: "Email not verified. Please verify your email first."
-      });
     }
 
     const token = jwt.sign({ userId: user._id, email: user.email, role: user.role }, process.env.JWT_SECRET || "proid_jwt_secret_key_2026_super_secret", { expiresIn: "7d" });
