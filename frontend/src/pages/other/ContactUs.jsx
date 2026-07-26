@@ -26,8 +26,8 @@ export default function ContactUs() {
 
     const contactInfo = [
         { icon: "fa-envelope", title: "Email", value: "anshumanverma9795@gmail.com", link: "mailto:anshumanverma9795@gmail.com" },
-        { icon: "fa-map-marker-alt", title: "Address", value: "Ballia, Uttar Pradesh - India" },
-        { icon: "fa-clock", title: "Support Hours", value: "Monday - Friday: 9 AM - 6 PM \nWeekends: 10 AM - 4 PM " }
+        { icon: "fa-location-dot", title: "Address", value: "Uttar Pradesh - India" },
+        { icon: "fa-clock", title: "Support Hours", value: "Mon - Sat: 9 AM - 6 PM IST" }
     ];
 
     const handleChange = (e) => {
@@ -37,197 +37,135 @@ export default function ContactUs() {
         setSuccess("");
     };
 
-    const validateForm = () => {
-        if (!form.name.trim()) {
-            setError("Please enter your name");
-            return false;
-        }
-        if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-            setError("Please enter a valid email address");
-            return false;
-        }
-        if (!form.subject.trim()) {
-            setError("Please enter a subject");
-            return false;
-        }
-        if (!form.message.trim() || form.message.length < 10) {
-            setError("Please enter a message with at least 10 characters");
-            return false;
-        }
-        return true;
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
         setSuccess("");
 
-        if (!validateForm()) return;
+        if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
+            setError("Please fill in all required fields.");
+            return;
+        }
 
         setLoading(true);
-
-        try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1500));
-
-            setSuccess("Thank you for your message! We'll get back to you within 24 hours.");
+        setTimeout(() => {
+            setSuccess("Thank you for contacting ProID Studio support! We will respond within 24 business hours.");
             setForm({ name: "", email: "", subject: "", message: "", category: "general" });
-        } catch (err) {
-            setError("Something went wrong. Please try again later.");
-        } finally {
             setLoading(false);
-        }
+        }, 1000);
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="min-h-screen bg-gray-50 text-gray-800 flex flex-col font-sans">
             <Header />
 
-            <main className="container mx-auto px-4 py-8">
-                <div className="max-w-6xl mx-auto animate-fade-in">
+            <main className="flex-1 container mx-auto px-4 py-8 max-w-6xl">
+                <div className="animate-fade-in">
                     {/* Header Section */}
-                    <div className="text-center mb-10">
-                        <h1 className="text-xl md:text-4xl font-bold text-primary mb-4">
+                    <div className="bg-gradient-to-r from-primary to-secondary text-white p-8 md:p-10 mb-8 border border-gray-300 shadow-md text-center">
+                        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-2">
                             Contact Us
                         </h1>
-                        <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-                            We're here to help! Get in touch with our support team for any questions or concerns.
+                        <p className="text-white/90 text-sm max-w-xl mx-auto">
+                            Have questions or need assistance with bulk generation? Get in touch with our team.
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        {/* Contact Information */}
-                        <div className="lg:col-span-1">
-                            <div className="bg-white rounded-2xl shadow-xl p-6 mb-6 sticky top-8">
-                                <h2 className="text-xl font-bold text-primary mb-6 flex items-center gap-2">
-                                    <i className="fas fa-info-circle"></i>
-                                    Contact Information
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                        {/* Contact Information Sidebar (4 Cols) */}
+                        <div className="lg:col-span-4">
+                            <div className="bg-white border border-gray-200 shadow-sm p-6 mb-6">
+                                <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2 border-b border-gray-200 pb-3">
+                                    <i className="fas fa-headset text-primary"></i> Direct Support
                                 </h2>
 
                                 <div className="space-y-6">
                                     {contactInfo.map((item, index) => (
                                         <div key={index} className="flex items-start gap-4">
-                                            <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                                                <i className={`fas ${item.icon} text-primary`}></i>
+                                            <div className="w-10 h-10 bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 font-bold text-base">
+                                                <i className={`fas ${item.icon}`}></i>
                                             </div>
                                             <div>
-                                                <h3 className="font-semibold text-gray-800 mb-1">{item.title}</h3>
+                                                <h3 className="font-bold text-gray-900 text-sm mb-0.5">{item.title}</h3>
                                                 {item.link ? (
                                                     <a
                                                         href={item.link}
-                                                        className="text-gray-600 hover:text-primary transition-colors duration-300 whitespace-pre-line"
+                                                        className="text-xs text-primary font-bold hover:underline"
                                                     >
                                                         {item.value}
                                                     </a>
                                                 ) : (
-                                                    <p className="text-gray-600 whitespace-pre-line">{item.value}</p>
+                                                    <p className="text-xs text-gray-600 leading-relaxed">{item.value}</p>
                                                 )}
                                             </div>
                                         </div>
                                     ))}
                                 </div>
-
-                                {/* Social Media */}
-                                <div className="mt-8 pt-6 border-t border-gray-200">
-                                    <h3 className="font-semibold text-gray-800 mb-4">Follow Us</h3>
-                                    <div className="flex gap-4">
-                                        {[
-                                            { icon: "fa-facebook", color: "hover:bg-secondary hover:text-white", link: "https://www.facebook.com/anshumanvermaanshu.anshu" },
-                                            { icon: "fa-linkedin", color: "hover:bg-secondary hover:text-white", link: "https://www.linkedin.com/in/anshuman-varma-0586b3337/" },
-                                            { icon: "fa-github", color: "hover:bg-secondary hover:text-white", link: "https://github.com/Anshuman892494" },
-                                            { icon: "fa-instagram", color: "hover:bg-secondary hover:text-white", link: "https://www.instagram.com/anshuman_verma_anshu/" }
-                                        ].map((social, index) => (
-                                            <a
-                                                key={index}
-                                                href={social.link}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className={`w-10 h-10 rounded-full bg-primary/10 text-primary hover:bg-primary/10 flex items-center justify-center transition-all duration-300 ${social.color} hover:text-primary`}
-                                                aria-label={social.icon.replace('fa-', '')}
-                                            >
-                                                <i className={`fab ${social.icon}`}></i>
-                                            </a>
-                                        ))}
-                                    </div>
-                                </div>
                             </div>
                         </div>
 
-                        {/* Contact Form */}
-                        <div className="lg:col-span-2">
-                            <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-8">
-                                <h2 className="text-xl font-bold text-primary mb-6">Send Us a Message</h2>
+                        {/* Contact Form (8 Cols) */}
+                        <div className="lg:col-span-8">
+                            <div className="bg-white border border-gray-200 shadow-sm p-6 md:p-8">
+                                <h2 className="text-xl font-extrabold text-gray-900 mb-6 border-b border-gray-200 pb-3">
+                                    Send Us a Message
+                                </h2>
 
-                                {/* Status Messages */}
                                 {error && (
-                                    <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                                        <div className="flex items-start gap-3">
-                                            <i className="fas fa-exclamation-circle text-red-500 mt-0.5"></i>
-                                            <span className="text-sm text-red-700">{error}</span>
-                                        </div>
+                                    <div className="mb-6 p-4 bg-red-50 border border-red-200 text-xs font-semibold text-red-700">
+                                        {error}
                                     </div>
                                 )}
 
                                 {success && (
-                                    <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                                        <div className="flex items-start gap-3">
-                                            <i className="fas fa-check-circle text-green-500 mt-0.5"></i>
-                                            <span className="text-sm text-green-700">{success}</span>
-                                        </div>
+                                    <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-700">
+                                        {success}
                                     </div>
                                 )}
 
-                                <form onSubmit={handleSubmit} className="space-y-6">
-                                    {/* Name and Email */}
+                                <form onSubmit={handleSubmit} className="space-y-6 text-xs">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
+                                            <label className="block font-bold text-gray-700 mb-1 uppercase tracking-wider">
                                                 Your Name *
                                             </label>
                                             <input
-                                                id="name"
-                                                name="name"
                                                 type="text"
+                                                name="name"
                                                 value={form.name}
                                                 onChange={handleChange}
-                                                placeholder="Enter your full name"
+                                                placeholder="Enter full name"
                                                 required
-                                                disabled={loading}
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100"
+                                                className="w-full px-3.5 py-2.5 border border-gray-300 focus:outline-none focus:border-primary transition-colors text-xs"
                                             />
                                         </div>
 
                                         <div>
-                                            <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                                            <label className="block font-bold text-gray-700 mb-1 uppercase tracking-wider">
                                                 Email Address *
                                             </label>
                                             <input
-                                                id="email"
-                                                name="email"
                                                 type="email"
+                                                name="email"
                                                 value={form.email}
                                                 onChange={handleChange}
                                                 placeholder="you@example.com"
                                                 required
-                                                disabled={loading}
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100"
+                                                className="w-full px-3.5 py-2.5 border border-gray-300 focus:outline-none focus:border-primary transition-colors text-xs"
                                             />
                                         </div>
                                     </div>
 
-                                    {/* Category and Subject */}
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <label htmlFor="category" className="block text-sm font-semibold text-gray-700 mb-2">
-                                                Inquiry Category *
+                                            <label className="block font-bold text-gray-700 mb-1 uppercase tracking-wider">
+                                                Inquiry Category
                                             </label>
                                             <select
-                                                id="category"
                                                 name="category"
                                                 value={form.category}
                                                 onChange={handleChange}
-                                                disabled={loading}
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 bg-white"
+                                                className="w-full px-3.5 py-2.5 border border-gray-300 focus:outline-none focus:border-primary transition-colors text-xs bg-white"
                                             >
                                                 {categories.map((cat) => (
                                                     <option key={cat.value} value={cat.value}>
@@ -238,65 +176,53 @@ export default function ContactUs() {
                                         </div>
 
                                         <div>
-                                            <label htmlFor="subject" className="block text-sm font-semibold text-gray-700 mb-2">
+                                            <label className="block font-bold text-gray-700 mb-1 uppercase tracking-wider">
                                                 Subject *
                                             </label>
                                             <input
-                                                id="subject"
-                                                name="subject"
                                                 type="text"
+                                                name="subject"
                                                 value={form.subject}
                                                 onChange={handleChange}
                                                 placeholder="What is this regarding?"
                                                 required
-                                                disabled={loading}
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100"
+                                                className="w-full px-3.5 py-2.5 border border-gray-300 focus:outline-none focus:border-primary transition-colors text-xs"
                                             />
                                         </div>
                                     </div>
 
-                                    {/* Message */}
                                     <div>
-                                        <label htmlFor="message" className="block text-sm font-semibold text-gray-700 mb-2">
+                                        <label className="block font-bold text-gray-700 mb-1 uppercase tracking-wider">
                                             Message *
                                         </label>
                                         <textarea
-                                            id="message"
                                             name="message"
                                             value={form.message}
                                             onChange={handleChange}
-                                            placeholder="Please provide details about your inquiry..."
-                                            rows={6}
+                                            placeholder="Provide details about your inquiry..."
+                                            rows={5}
                                             required
-                                            disabled={loading}
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 resize-none"
+                                            className="w-full px-3.5 py-2.5 border border-gray-300 focus:outline-none focus:border-primary transition-colors text-xs resize-none"
                                         />
-                                        <p className="text-xs text-gray-500 mt-2">
-                                            Please include relevant details such as account email, order number, or screenshots if applicable.
-                                        </p>
                                     </div>
 
-                                    {/* Submit Button */}
                                     <button
                                         type="submit"
                                         disabled={loading}
-                                        className="w-full bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 hover:shadow-lg hover:translate-y-[-1px] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                        className="w-full py-3 bg-primary hover:bg-secondary text-white font-bold text-xs uppercase tracking-wider shadow-sm transition-all flex items-center justify-center gap-2"
                                     >
                                         {loading ? (
                                             <>
-                                                <i className="fas fa-spinner fa-spin"></i>
-                                                Sending Message...
+                                                <i className="fas fa-spinner fa-spin"></i> Sending...
                                             </>
                                         ) : (
                                             <>
-                                                <i className="fas fa-paper-plane"></i>
-                                                Send Message
+                                                <i className="fas fa-paper-plane"></i> Send Inquiry Message
                                             </>
                                         )}
                                     </button>
                                 </form>
                             </div>
-
                         </div>
                     </div>
                 </div>

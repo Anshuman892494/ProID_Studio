@@ -9,7 +9,7 @@ export default function Home() {
 
             <main className="container mx-auto px-4 py-8">
                 {/* Hero Section */}
-                <section className="relative overflow-hidden rounded-2xl mb-12">
+                <section className="relative overflow-hidden mb-12 border border-gray-200 shadow-md">
                     <div className="absolute inset-0">
                         <img
                             src="https://www.shutterstock.com/image-photo/human-finger-tuching-digital-identity-260nw-2314098117.jpg"
@@ -29,14 +29,14 @@ export default function Home() {
                         <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up animation-delay-400">
                             <a
                                 href="/generate"
-                                className="inline-flex items-center justify-center bg-accent hover:bg-accent/90 text-white font-semibold px-8 py-3 rounded-full transition-all duration-300 hover:shadow-lg hover:translate-y-[-2px]"
+                                className="inline-flex items-center justify-center bg-accent hover:bg-accent/90 text-white font-semibold px-8 py-3 transition-all duration-300 hover:shadow-lg hover:translate-y-[-2px]"
                             >
                                 <i className="fas fa-plus mr-2"></i>
                                 Create ID Card
                             </a>
                             <a
                                 href="/register"
-                                className="inline-flex items-center justify-center bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white font-semibold px-8 py-3 rounded-full transition-all duration-300 hover:shadow-lg hover:translate-y-[-2px] border border-white/30"
+                                className="inline-flex items-center justify-center bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white font-semibold px-8 py-3 transition-all duration-300 hover:shadow-lg hover:translate-y-[-2px] border border-white/30"
                             >
                                 <i className="fas fa-rocket mr-2"></i>
                                 Get Started Free
@@ -57,8 +57,8 @@ export default function Home() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:translate-y-[-4px] animate-fade-in-up">
-                            <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                        <div className="bg-white border border-gray-200 p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:translate-y-[-4px] animate-fade-in-up">
+                            <div className="w-12 h-12 bg-primary/10 flex items-center justify-center mb-4">
                                 <i className="fas fa-bolt text-2xl text-primary"></i>
                             </div>
                             <h3 className="text-xl font-bold text-secondary mb-3">Quick & Easy</h3>
@@ -83,8 +83,8 @@ export default function Home() {
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:translate-y-[-4px] animate-fade-in-up animation-delay-200">
-                            <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                        <div className="bg-white border border-gray-200 p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:translate-y-[-4px] animate-fade-in-up animation-delay-200">
+                            <div className="w-12 h-12 bg-primary/10 flex items-center justify-center mb-4">
                                 <i className="fas fa-shield-alt text-2xl text-primary"></i>
                             </div>
                             <h3 className="text-xl font-bold text-secondary mb-3">Secure & Reliable</h3>
@@ -109,8 +109,8 @@ export default function Home() {
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:translate-y-[-4px] animate-fade-in-up animation-delay-400">
-                            <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                        <div className="bg-white border border-gray-200 p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:translate-y-[-4px] animate-fade-in-up animation-delay-400">
+                            <div className="w-12 h-12 bg-primary/10 flex items-center justify-center mb-4">
                                 <i className="fas fa-palette text-2xl text-primary"></i>
                             </div>
                             <h3 className="text-xl font-bold text-secondary mb-3">Fully Customizable</h3>
@@ -138,7 +138,7 @@ export default function Home() {
                 </section>
 
                 {/* Additional Features */}
-                <section className="py-12 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-2xl px-6 my-12">
+                <section className="py-12 bg-gradient-to-r from-primary/5 to-secondary/5 border border-gray-200 px-6 my-12">
                     <div className="text-center mb-12">
                         <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
                             Everything You Need for Professional ID Cards
@@ -157,9 +157,9 @@ export default function Home() {
                         ].map((feature, index) => (
                             <div
                                 key={index}
-                                className="bg-white/80 backdrop-blur-sm rounded-xl p-5 text-center hover:bg-white transition-all duration-300"
+                                className="bg-white/80 backdrop-blur-sm border border-gray-200 p-5 text-center hover:bg-white transition-all duration-300"
                             >
-                                <div className="w-14 h-14 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-4">
+                                <div className="w-14 h-14 bg-gradient-to-br from-primary to-secondary flex items-center justify-center mx-auto mb-4">
                                     <i className={`fas ${feature.icon} text-white text-xl`}></i>
                                 </div>
                                 <h4 className="font-bold text-gray-800 mb-2">{feature.title}</h4>
@@ -181,7 +181,7 @@ export default function Home() {
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <a
                                 href="/register"
-                                className="inline-flex items-center justify-center bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary text-white font-semibold px-8 py-3 rounded-full transition-all duration-300 hover:shadow-xl hover:translate-y-[-2px]"
+                                className="inline-flex items-center justify-center bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary text-white font-semibold px-8 py-3 transition-all duration-300 hover:shadow-xl hover:translate-y-[-2px]"
                             >
                                 <i className="fas fa-user-plus mr-2"></i>
                                 Join

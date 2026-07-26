@@ -19,7 +19,6 @@ export default function UpdatePassword() {
   const [passwordStrength, setPasswordStrength] = useState(0);
   const navigate = useNavigate();
 
-  // Redirect to login if user not logged in
   useEffect(() => {
     const user = localStorage.getItem("user");
     if (!user) {
@@ -27,7 +26,6 @@ export default function UpdatePassword() {
     }
   }, [navigate]);
 
-  // Check new password strength
   useEffect(() => {
     let strength = 0;
     if (form.newPassword.length >= 8) strength++;
@@ -46,16 +44,13 @@ export default function UpdatePassword() {
   };
 
   const validateForm = () => {
-    // Clear previous messages
     setError("");
 
-    // Check if old password is entered
     if (!form.oldPassword.trim()) {
       setError("Old password is required");
       return false;
     }
 
-    // Check if new password is strong enough
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
     if (!passwordRegex.test(form.newPassword)) {
       setError(
@@ -64,13 +59,11 @@ export default function UpdatePassword() {
       return false;
     }
 
-    // Check if passwords match
     if (form.newPassword !== form.confirmPassword) {
       setError("New passwords do not match");
       return false;
     }
 
-    // Check if new password is different from old password
     if (form.oldPassword === form.newPassword) {
       setError("New password must be different from old password");
       return false;
@@ -113,11 +106,8 @@ export default function UpdatePassword() {
 
       if (res.ok) {
         setSuccess("Password updated successfully!");
-
-        // Reset form
         setForm({ oldPassword: "", newPassword: "", confirmPassword: "" });
 
-        // Redirect after delay
         setTimeout(() => {
           navigate("/dashboard");
         }, 2000);
@@ -138,7 +128,6 @@ export default function UpdatePassword() {
 
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-md mx-auto animate-fade-in">
-          {/* Header Section */}
           <div className="text-center mb-8">
             <h1 className="text-2xl md:text-3xl font-bold text-primary mb-2">
               Update Password
@@ -148,11 +137,9 @@ export default function UpdatePassword() {
             </p>
           </div>
 
-          {/* Password Update Form */}
-          <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8">
-            {/* Status Messages */}
+          <div className="bg-white border border-gray-200 shadow-xl p-6 md:p-8">
             {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="mb-6 p-4 bg-red-50 border border-red-200">
                 <div className="flex items-start gap-3">
                   <i className="fas fa-exclamation-circle text-red-500 mt-0.5"></i>
                   <span className="text-sm text-red-700">{error}</span>
@@ -161,7 +148,7 @@ export default function UpdatePassword() {
             )}
 
             {success && (
-              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <div className="mb-6 p-4 bg-green-50 border border-green-200">
                 <div className="flex items-start gap-3">
                   <i className="fas fa-check-circle text-green-500 mt-0.5"></i>
                   <span className="text-sm text-green-700">{success}</span>
@@ -170,7 +157,6 @@ export default function UpdatePassword() {
             )}
 
             <form onSubmit={submit} className="space-y-6">
-              {/* Old Password */}
               <div>
                 <label htmlFor="oldPassword" className="block text-sm font-semibold text-gray-700 mb-2">
                   Current Password *
@@ -186,7 +172,7 @@ export default function UpdatePassword() {
                     required
                     disabled={loading}
                     autoComplete="current-password"
-                    className="w-full px-4 py-3 pl-12 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    className="w-full px-4 py-3 pl-12 pr-12 border border-gray-300 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
                   />
                   <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
                     <i className="fas fa-lock text-gray-400"></i>
@@ -203,7 +189,6 @@ export default function UpdatePassword() {
                 </div>
               </div>
 
-              {/* New Password */}
               <div>
                 <label htmlFor="newPassword" className="block text-sm font-semibold text-gray-700 mb-2">
                   New Password *
@@ -219,7 +204,7 @@ export default function UpdatePassword() {
                     required
                     disabled={loading}
                     autoComplete="new-password"
-                    className="w-full px-4 py-3 pl-12 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    className="w-full px-4 py-3 pl-12 pr-12 border border-gray-300 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
                   />
                   <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
                     <i className="fas fa-key text-gray-400"></i>
@@ -235,7 +220,6 @@ export default function UpdatePassword() {
                   </button>
                 </div>
 
-                {/* Password Strength Indicator */}
                 {form.newPassword && (
                   <div className="mt-2">
                     <div className="flex justify-between text-xs text-gray-600 mb-1">
@@ -244,7 +228,7 @@ export default function UpdatePassword() {
                         {passwordStrength <= 2 ? "Weak" : passwordStrength <= 3 ? "Good" : "Strong"}
                       </span>
                     </div>
-                    <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-gray-200 overflow-hidden">
                       <div
                         className={`h-full ${getPasswordStrengthColor(passwordStrength)} transition-all duration-300`}
                         style={{ width: `${(passwordStrength / 5) * 100}%` }}
@@ -254,7 +238,6 @@ export default function UpdatePassword() {
                 )}
               </div>
 
-              {/* Confirm New Password */}
               <div>
                 <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 mb-2">
                   Confirm New Password *
@@ -270,7 +253,7 @@ export default function UpdatePassword() {
                     required
                     disabled={loading}
                     autoComplete="new-password"
-                    className={`w-full px-4 py-3 pl-12 pr-12 border rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed ${form.confirmPassword && form.newPassword !== form.confirmPassword
+                    className={`w-full px-4 py-3 pl-12 pr-12 border focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed ${form.confirmPassword && form.newPassword !== form.confirmPassword
                       ? 'border-red-300'
                       : 'border-gray-300'
                       }`}
@@ -298,11 +281,10 @@ export default function UpdatePassword() {
                 )}
               </div>
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 hover:shadow-lg hover:translate-y-[-1px] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary text-white font-semibold py-3 px-4 transition-all duration-300 hover:shadow-lg hover:translate-y-[-1px] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>
@@ -317,7 +299,6 @@ export default function UpdatePassword() {
                 )}
               </button>
 
-              {/* Cancel Link */}
               <div className="text-center pt-4 border-t border-gray-200">
                 <Link
                   to="/dashboard"

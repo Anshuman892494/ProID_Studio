@@ -1,280 +1,300 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 
 export default function HelpSupport() {
+    const [searchQuery, setSearchQuery] = useState("");
+    const [openFaqIndex, setOpenFaqIndex] = useState(null);
+    const [activeTab, setActiveTab] = useState("all");
+
+    const faqs = [
+        {
+            question: "What file formats can I upload for logos and photos?",
+            answer: "We support high-resolution PNG, JPG, JPEG, and WebP files. For company logos, transparent PNG files are recommended for best quality.",
+            category: "general"
+        },
+        {
+            question: "How does Bulk CSV Card Generation work?",
+            answer: "In the Bulk CSV page, download our sample CSV template, fill in student/employee details (Name, ID, Role, Department), and upload it. The studio generates all cards automatically in batch.",
+            category: "bulk"
+        },
+        {
+            question: "What printing size and DPI specifications are used?",
+            answer: "ProID Studio generates standard CR80 ID cards (85.6mm x 53.98mm) at 300 DPI high resolution, perfectly matching plastic PVC card printers and standard laminators.",
+            category: "printing"
+        },
+        {
+            question: "Is my card data and photos stored securely?",
+            answer: "Yes, all student and employee data is stored with 256-bit SSL encryption. We never share your data or card designs with third parties.",
+            category: "security"
+        },
+        {
+            question: "Can I download cards in PDF and image format?",
+            answer: "Yes! In the ID Studio, click 'Download PNG' for high-resolution graphics or 'Export PDF' for standard printable CR80 PDF documents.",
+            category: "general"
+        },
+        {
+            question: "How do I scan the QR code on the ID card?",
+            answer: "Every card automatically generates a high-density QR code containing member ID and verification link, scannable by any mobile camera or QR reader.",
+            category: "printing"
+        }
+    ];
+
+    const toggleFaq = (index) => {
+        setOpenFaqIndex(openFaqIndex === index ? null : index);
+    };
+
+    const filteredFaqs = faqs.filter((faq) => {
+        const matchesQuery =
+            faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            faq.answer.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesTab = activeTab === "all" || faq.category === activeTab;
+        return matchesQuery && matchesTab;
+    });
+
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="min-h-screen bg-gray-50 font-sans flex flex-col">
             <Header />
 
-            <main className="container mx-auto px-4 py-8">
-                <div className="max-w-5xl mx-auto animate-fade-in">
-                    {/* Header Section */}
-                    <div className="text-center mb-12">
-                        <h1 className="text-3xl md:text-3xl font-bold text-primary mb-4">
-                            Help & Support
-                        </h1>
-                        <p className="text-gray-600 text-lg md:text-xl max-w-2xl mx-auto">
-                            Get assistance, find answers to common questions, and learn how to make the most of ProID Studio
-                        </p>
+            <main className="flex-1 container mx-auto px-4 py-8 max-w-6xl">
+                {/* Hero Header & Search */}
+                <div className="bg-gradient-to-r from-primary to-secondary text-white p-8 md:p-12 mb-10 border border-gray-300 shadow-lg text-center relative overflow-hidden">
+                    <span className="bg-white/20 text-white text-xs font-bold px-3 py-1 uppercase tracking-wider mb-4 inline-block">
+                        ProID Help Center
+                    </span>
+                    <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-4">
+                        How can we help you today?
+                    </h1>
+                    <p className="text-white/90 text-sm md:text-base max-w-2xl mx-auto mb-8 leading-relaxed">
+                        Search our knowledge base, browse FAQs, or get in touch with our dedicated support team.
+                    </p>
+
+                    {/* Interactive Search Bar */}
+                    <div className="max-w-xl mx-auto relative">
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Type your question or issue (e.g. CSV, PNG, Print)..."
+                            className="w-full px-5 py-4 pl-12 text-gray-900 bg-white shadow-xl focus:outline-none focus:ring-2 focus:ring-accent text-sm"
+                        />
+                        <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
+                        {searchQuery && (
+                            <button
+                                onClick={() => setSearchQuery("")}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm font-bold"
+                            >
+                                Clear
+                            </button>
+                        )}
                     </div>
-
-                    {/* Quick Help Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                        <div className="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-shadow duration-300 border border-primary/10">
-                            <div className="inline-flex items-center justify-center w-14 h-14 bg-primary/10 text-primary rounded-full mb-4">
-                                <i className="fas fa-question-circle text-2xl"></i>
-                            </div>
-                            <h3 className="text-xl font-semibold text-primary mb-3">FAQs</h3>
-                            <p className="text-gray-600 mb-4">Find quick answers to common questions</p>
-                            <a href="#faqs" className="text-primary hover:text-primary/80 font-medium inline-flex items-center">
-                                Browse FAQs <i className="fas fa-arrow-right ml-2"></i>
-                            </a>
-                        </div>
-
-                        <div className="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-shadow duration-300 border border-primary/10">
-                            <div className="inline-flex items-center justify-center w-14 h-14 bg-primary/10 text-primary rounded-full mb-4">
-                                <i className="fas fa-book text-2xl"></i>
-                            </div>
-                            <h3 className="text-xl font-semibold text-primary mb-3">Troubleshooting</h3>
-                            <p className="text-gray-600 mb-4">Step-by-step instructions</p>
-                            <a href="#Troubleshooting" className="text-primary hover:text-primary/80 font-medium inline-flex items-center">
-                                View Guides <i className="fas fa-arrow-right ml-2"></i>
-                            </a>
-                        </div>
-
-                        <div className="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-shadow duration-300 border border-primary/10">
-                            <div className="inline-flex items-center justify-center w-14 h-14 bg-primary/10 text-primary rounded-full mb-4">
-                                <i className="fas fa-headset text-2xl"></i>
-                            </div>
-                            <h3 className="text-xl font-semibold text-primary mb-3">Contact Support</h3>
-                            <p className="text-gray-600 mb-4">Get in touch with our support team</p>
-                            <Link to="/contact" className="text-primary hover:text-primary/80 font-medium inline-flex items-center">
-                                Contact Us <i className="fas fa-arrow-right ml-2"></i>
-                            </Link>
-                        </div>
-                    </div>
-
-                    {/* Main Content */}
-                    <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-8">
-                        <div className="prose prose-lg max-w-none">
-                            {/* Getting Started Section */}
-                            <section className="mb-10">
-                                <h2 className="text-2xl font-bold text-primary mb-6 pb-3 border-b border-gray-200">
-                                    <i className="fas fa-rocket text-primary mr-3"></i>
-                                    Getting Started
-                                </h2>
-
-                                <div className="space-y-6">
-                                    <div className="bg-primary/5 rounded-lg p-5 border-l-4 border-primary">
-                                        <h3 className="text-lg font-semibold text-primary mb-2">1. Create Your Account</h3>
-                                        <p className="text-gray-700">Sign up for a free account to start creating ID cards. No credit card required for the free plan.</p>
-                                    </div>
-
-                                    <div className="bg-primary/5 rounded-lg p-5 border-l-4 border-primary/80">
-                                        <h3 className="text-lg font-semibold text-primary mb-2">2. Choose a Template</h3>
-                                        <p className="text-gray-700">Browse our template library and select a design that fits your needs.</p>
-                                    </div>
-
-                                    <div className="bg-primary/5 rounded-lg p-5 border-l-4 border-primary/60">
-                                        <h3 className="text-lg font-semibold text-primary mb-2">3. Customize Your Design</h3>
-                                        <p className="text-gray-700">Add your logo, photos, text, and customize colors to match your brand.</p>
-                                    </div>
-
-                                    <div className="bg-primary/5 rounded-lg p-5 border-l-4 border-primary/40">
-                                        <h3 className="text-lg font-semibold text-primary mb-2">4. Generate & Download</h3>
-                                        <p className="text-gray-700">Generate your ID cards and download them in high-quality PDF or image formats.</p>
-                                    </div>
-                                </div>
-                            </section>
-
-                            {/* Frequently Asked Questions */}
-                            <section className="mb-10" id="faqs">
-                                <h2 className="text-2xl font-bold text-primary mb-6 pb-3 border-b border-gray-200">
-                                    <i className="fas fa-question-circle text-primary mr-3"></i>
-                                    Frequently Asked Questions
-                                </h2>
-
-                                <div className="space-y-4">
-                                    {/* FAQ Item */}
-                                    <div className="border border-gray-200 rounded-lg overflow-hidden">
-                                        <button className="w-full text-left p-4 bg-primary/5 hover:bg-primary/10 transition-colors duration-200 flex justify-between items-center">
-                                            <span className="font-semibold text-primary">What file formats can I upload for logos and photos?</span>
-                                            <i className="fas fa-chevron-down text-primary/60"></i>
-                                        </button>
-                                        <div className="p-4 border-t border-gray-200">
-                                            <p className="text-gray-700">
-                                                We support JPG, PNG, and SVG files. For best results, use high-resolution images (minimum 300x300 pixels) and SVG format for logos.
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    {/* FAQ Item */}
-                                    <div className="border border-gray-200 rounded-lg overflow-hidden">
-                                        <button className="w-full text-left p-4 bg-primary/5 hover:bg-primary/10 transition-colors duration-200 flex justify-between items-center">
-                                            <span className="font-semibold text-primary">Can I use ProID Studio for commercial purposes?</span>
-                                            <i className="fas fa-chevron-down text-primary/60"></i>
-                                        </button>
-                                        <div className="p-4 border-t border-gray-200">
-                                            <p className="text-gray-700">
-                                                Yes, with our Business and Enterprise plans. Our free plan is for personal and non-commercial use only. Please review our Terms of Service for details.
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    {/* FAQ Item */}
-                                    <div className="border border-gray-200 rounded-lg overflow-hidden">
-                                        <button className="w-full text-left p-4 bg-primary/5 hover:bg-primary/10 transition-colors duration-200 flex justify-between items-center">
-                                            <span className="font-semibold text-primary">How do I cancel my subscription?</span>
-                                            <i className="fas fa-chevron-down text-primary/60"></i>
-                                        </button>
-                                        <div className="p-4 border-t border-gray-200">
-                                            <p className="text-gray-700">
-                                                You can cancel anytime from your Account Settings → Billing section. Your subscription will remain active until the end of the billing period.
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    {/* FAQ Item */}
-                                    <div className="border border-gray-200 rounded-lg overflow-hidden">
-                                        <button className="w-full text-left p-4 bg-primary/5 hover:bg-primary/10 transition-colors duration-200 flex justify-between items-center">
-                                            <span className="font-semibold text-primary">Is my data secure with ProID Studio?</span>
-                                            <i className="fas fa-chevron-down text-primary/60"></i>
-                                        </button>
-                                        <div className="p-4 border-t border-gray-200">
-                                            <p className="text-gray-700">
-                                                Yes, we use industry-standard encryption and security measures. Your data is stored securely and we never share your information with third parties. Read our <Link to="/privacy" className="text-primary hover:text-primary/80">Privacy Policy</Link> for more details.
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    {/* FAQ Item */}
-                                    <div className="border border-gray-200 rounded-lg overflow-hidden">
-                                        <button className="w-full text-left p-4 bg-primary/5 hover:bg-primary/10 transition-colors duration-200 flex justify-between items-center">
-                                            <span className="font-semibold text-primary">What printing specifications do you recommend?</span>
-                                            <i className="fas fa-chevron-down text-primary/60"></i>
-                                        </button>
-                                        <div className="p-4 border-t border-gray-200">
-                                            <p className="text-gray-700">
-                                                For best results, use 300 DPI resolution, standard ID card size (3.375" x 2.125"), and PVC or thick cardstock paper. Our templates are optimized for professional printing.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
-
-                            {/* Troubleshooting */}
-                            <section className="mb-10" id="Troubleshooting">
-                                <h2 className="text-2xl font-bold text-primary mb-6 pb-3 border-b border-gray-200">
-                                    <i className="fas fa-tools text-primary mr-3"></i>
-                                    Troubleshooting
-                                </h2>
-
-                                <div className="space-y-4">
-                                    <div className="flex items-start gap-3 p-4 bg-primary/5 border border-primary/20 rounded-lg">
-                                        <i className="fas fa-exclamation-triangle text-primary mt-1"></i>
-                                        <div>
-                                            <h4 className="font-semibold text-primary mb-1">Upload Issues</h4>
-                                            <p className="text-primary/80 text-sm">If files aren't uploading, check file size (max 10MB), format, and internet connection.</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-start gap-3 p-4 bg-primary/5 border border-primary/20 rounded-lg">
-                                        <i className="fas fa-exclamation-circle text-primary mt-1"></i>
-                                        <div>
-                                            <h4 className="font-semibold text-primary mb-1">Slow Performance</h4>
-                                            <p className="text-primary/80 text-sm">Clear browser cache, update browser, or try reducing image sizes for better performance.</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-start gap-3 p-4 bg-primary/5 border border-primary/20 rounded-lg">
-                                        <i className="fas fa-info-circle text-primary mt-1"></i>
-                                        <div>
-                                            <h4 className="font-semibold text-primary mb-1">Print Quality Issues</h4>
-                                            <p className="text-primary/80 text-sm">Ensure you're downloading high-quality PDFs and using recommended printer settings.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
-
-                            {/* Contact Support Section */}
-                            <section className="mb-8">
-                                <h2 className="text-2xl font-bold text-primary mb-6 pb-3 border-b border-gray-200">
-                                    <i className="fas fa-headset text-primary mr-3"></i>
-                                    Still Need Help?
-                                </h2>
-
-                                <div className="bg-primary/5 rounded-xl p-6 border border-primary/10">
-                                    <h3 className="text-xl font-semibold text-primary mb-4">Contact Our Support Team</h3>
-                                    <p className="text-gray-700 mb-6">
-                                        Our support team is available to help you with any questions or issues you may have.
-                                    </p>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="space-y-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 bg-primary/10 text-primary rounded-lg flex items-center justify-center">
-                                                    <i className="fas fa-envelope"></i>
-                                                </div>
-                                                <div>
-                                                    <p className="font-medium text-gray-700">Email Support</p>
-                                                    <a href="mailto:support@proidstudio.com" className="text-primary hover:text-primary/80">
-                                                        anshumanverma9795@gmail.com
-                                                    </a>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 bg-primary/10 text-primary rounded-lg flex items-center justify-center">
-                                                    <i className="fas fa-clock"></i>
-                                                </div>
-                                                <div>
-                                                    <p className="font-medium text-gray-700">Response Time</p>
-                                                    <p className="text-gray-600">Within 24 hours on business days</p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 bg-primary/10 text-primary rounded-lg flex items-center justify-center">
-                                                    <i className="fas fa-phone"></i>
-                                                </div>
-                                                <div>
-                                                    <p className="font-medium text-gray-700">Phone Support</p>
-                                                    <a href="tel:+911234567890" className="text-primary hover:text-primary/80">
-                                                        +91 892494xxxx
-                                                    </a>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 bg-primary/10 text-primary rounded-lg flex items-center justify-center">
-                                                    <i className="fas fa-comments"></i>
-                                                </div>
-                                                <div>
-                                                    <p className="font-medium text-gray-700">Live Chat</p>
-                                                    <p className="text-gray-600">Available 9 AM - 6 PM IST</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="mt-8 pt-6 border-t border-gray-200">
-                                        <h4 className="font-semibold text-primary mb-3">Before Contacting Support</h4>
-                                        <ul className="list-disc pl-5 text-primary/80 space-y-1">
-                                            <li>Check if your question is already answered in the FAQs</li>
-                                            <li>Have your account email ready</li>
-                                            <li>Include screenshots if reporting an issue</li>
-                                            <li>Specify the browser and device you're using</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </section>
-                        </div>
-                    </div>
-
                 </div>
+
+                {/* Quick Assistance Category Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    <div className="bg-white border border-gray-200 p-6 shadow-sm hover:shadow-md transition-all hover:border-primary">
+                        <div className="w-12 h-12 bg-primary/10 text-primary flex items-center justify-center text-xl font-bold mb-4">
+                            <i className="fas fa-book-open"></i>
+                        </div>
+                        <h3 className="font-extrabold text-gray-900 text-lg mb-2">Documentation & Guides</h3>
+                        <p className="text-xs text-gray-600 leading-relaxed mb-4">
+                            Learn how to upload logos, pick color themes, and export high-res print files.
+                        </p>
+                        <a href="#guides" className="text-xs font-bold text-primary hover:text-secondary uppercase tracking-wider inline-flex items-center gap-1">
+                            Read Guides <i className="fas fa-arrow-right text-[10px]"></i>
+                        </a>
+                    </div>
+
+                    <div className="bg-white border border-gray-200 p-6 shadow-sm hover:shadow-md transition-all hover:border-primary">
+                        <div className="w-12 h-12 bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl font-bold mb-4">
+                            <i className="fas fa-file-csv"></i>
+                        </div>
+                        <h3 className="font-extrabold text-gray-900 text-lg mb-2">Bulk CSV Assistant</h3>
+                        <p className="text-xs text-gray-600 leading-relaxed mb-4">
+                            Learn how to format CSV files for batch generating 100+ cards simultaneously.
+                        </p>
+                        <Link to="/bulk-generate" className="text-xs font-bold text-emerald-700 hover:text-emerald-900 uppercase tracking-wider inline-flex items-center gap-1">
+                            Go to Bulk CSV <i className="fas fa-arrow-right text-[10px]"></i>
+                        </Link>
+                    </div>
+
+                    <div className="bg-white border border-gray-200 p-6 shadow-sm hover:shadow-md transition-all hover:border-primary">
+                        <div className="w-12 h-12 bg-purple-100 text-purple-700 flex items-center justify-center text-xl font-bold mb-4">
+                            <i className="fas fa-headset"></i>
+                        </div>
+                        <h3 className="font-extrabold text-gray-900 text-lg mb-2">Direct Contact</h3>
+                        <p className="text-xs text-gray-600 leading-relaxed mb-4">
+                            Need customized card templates or technical assistance? Talk to our team.
+                        </p>
+                        <a href="#contact" className="text-xs font-bold text-purple-700 hover:text-purple-900 uppercase tracking-wider inline-flex items-center gap-1">
+                            Contact Team <i className="fas fa-arrow-right text-[10px]"></i>
+                        </a>
+                    </div>
+                </div>
+
+                {/* Step-by-step Interactive Guides */}
+                <section className="mb-12" id="guides">
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2">
+                            <i className="fas fa-rocket text-primary"></i> Getting Started Guides
+                        </h2>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div className="bg-white border border-gray-200 p-5 shadow-sm">
+                            <div className="w-8 h-8 bg-primary text-white font-bold flex items-center justify-center text-sm mb-3">
+                                1
+                            </div>
+                            <h4 className="font-bold text-gray-900 text-sm mb-1">Enter Card Details</h4>
+                            <p className="text-xs text-gray-600 leading-relaxed">
+                                Enter holder Name, Designation, ID Number, Organization, and Phone in ID Studio.
+                            </p>
+                        </div>
+
+                        <div className="bg-white border border-gray-200 p-5 shadow-sm">
+                            <div className="w-8 h-8 bg-primary text-white font-bold flex items-center justify-center text-sm mb-3">
+                                2
+                            </div>
+                            <h4 className="font-bold text-gray-900 text-sm mb-1">Choose Color Theme</h4>
+                            <p className="text-xs text-gray-600 leading-relaxed">
+                                Select from Corporate Blue, Modern Emerald, Executive Dark, Sunset Amber, or Custom colors.
+                            </p>
+                        </div>
+
+                        <div className="bg-white border border-gray-200 p-5 shadow-sm">
+                            <div className="w-8 h-8 bg-primary text-white font-bold flex items-center justify-center text-sm mb-3">
+                                3
+                            </div>
+                            <h4 className="font-bold text-gray-900 text-sm mb-1">Upload Photo & Logo</h4>
+                            <p className="text-xs text-gray-600 leading-relaxed">
+                                Upload profile headshot photo and organization logo for instant high-res rendering.
+                            </p>
+                        </div>
+
+                        <div className="bg-white border border-gray-200 p-5 shadow-sm">
+                            <div className="w-8 h-8 bg-primary text-white font-bold flex items-center justify-center text-sm mb-3">
+                                4
+                            </div>
+                            <h4 className="font-bold text-gray-900 text-sm mb-1">Export PNG / PDF</h4>
+                            <p className="text-xs text-gray-600 leading-relaxed">
+                                Export high-res PNG for digital use or standard CR80 PDF for PVC card printing.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Frequently Asked Questions (Accordion) */}
+                <section className="mb-12">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                        <div>
+                            <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2">
+                                <i className="fas fa-circle-question text-primary"></i> Frequently Asked Questions
+                            </h2>
+                            <p className="text-xs text-gray-500 mt-1">Click on any question to view the answer</p>
+                        </div>
+
+                        {/* Category Tabs */}
+                        <div className="flex items-center gap-1 bg-gray-100 p-1 border border-gray-200 text-xs font-bold">
+                            {["all", "general", "bulk", "printing", "security"].map((cat) => (
+                                <button
+                                    key={cat}
+                                    onClick={() => setActiveTab(cat)}
+                                    className={`px-3 py-1.5 uppercase transition-colors ${activeTab === cat ? "bg-primary text-white" : "text-gray-600 hover:text-gray-900"
+                                        }`}
+                                >
+                                    {cat}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="space-y-3">
+                        {filteredFaqs.length === 0 ? (
+                            <div className="bg-white border border-gray-200 p-8 text-center text-gray-500">
+                                <i className="fas fa-search text-2xl mb-2 text-gray-400"></i>
+                                <p className="font-bold text-sm">No FAQs found for "{searchQuery}"</p>
+                            </div>
+                        ) : (
+                            filteredFaqs.map((faq, idx) => (
+                                <div key={idx} className="bg-white border border-gray-200 shadow-sm">
+                                    <button
+                                        onClick={() => toggleFaq(idx)}
+                                        className="w-full text-left p-4 font-bold text-gray-900 flex items-center justify-between gap-4 hover:bg-gray-50 transition-colors text-sm"
+                                    >
+                                        <span className="flex items-center gap-2">
+                                            <i className="fas fa-question-circle text-primary text-xs"></i>
+                                            {faq.question}
+                                        </span>
+                                        <i className={`fas fa-chevron-down text-xs text-gray-400 transition-transform ${openFaqIndex === idx ? "rotate-180 text-primary" : ""}`}></i>
+                                    </button>
+
+                                    {openFaqIndex === idx && (
+                                        <div className="px-4 pb-4 pt-1 text-xs text-gray-700 leading-relaxed border-t border-gray-100 bg-gray-50">
+                                            {faq.answer}
+                                        </div>
+                                    )}
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </section>
+
+                {/* Contact Hub Box */}
+                <section className="bg-white border border-gray-200 p-8 shadow-sm" id="contact">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-gray-200 pb-6 mb-6">
+                        <div>
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-2.5 py-1 inline-block mb-2">
+                                Dedicated Customer Support
+                            </span>
+                            <h3 className="text-2xl font-extrabold text-gray-900">Still have questions?</h3>
+                            <p className="text-xs text-gray-600 mt-1">Our support engineers are available Monday through Saturday to assist you.</p>
+                        </div>
+
+                        <a
+                            href="mailto:anshumanverma9795@gmail.com"
+                            className="px-6 py-3 bg-primary hover:bg-secondary text-white font-bold text-xs uppercase tracking-wider shadow-sm transition-all text-center"
+                        >
+                            <i className="fas fa-envelope mr-2"></i> Send Email Inquiry
+                        </a>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
+                        <div className="p-4 bg-gray-50 border border-gray-200 flex items-center gap-3">
+                            <div className="w-10 h-10 bg-primary/10 text-primary flex items-center justify-center font-bold text-base">
+                                <i className="fas fa-envelope"></i>
+                            </div>
+                            <div>
+                                <div className="text-gray-500 font-medium">Email Address</div>
+                                <a href="mailto:anshumanverma9795@gmail.com" className="font-bold text-primary hover:underline">
+                                    anshumanverma9795@gmail.com
+                                </a>
+                            </div>
+                        </div>
+
+                        <div className="p-4 bg-gray-50 border border-gray-200 flex items-center gap-3">
+                            <div className="w-10 h-10 bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-base">
+                                <i className="fas fa-clock"></i>
+                            </div>
+                            <div>
+                                <div className="text-gray-500 font-medium">Response SLA</div>
+                                <div className="font-bold text-gray-900">Within 24 Business Hours</div>
+                            </div>
+                        </div>
+
+                        <div className="p-4 bg-gray-50 border border-gray-200 flex items-center gap-3">
+                            <div className="w-10 h-10 bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-base">
+                                <i className="fas fa-phone"></i>
+                            </div>
+                            <div>
+                                <div className="text-gray-500 font-medium">Phone Support</div>
+                                <a href="tel:+918924949494" className="font-bold text-purple-700">
+                                    +91 892494xxxx
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </main>
 
             <Footer />

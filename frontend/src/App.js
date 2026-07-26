@@ -1,12 +1,12 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import BeforeLoginHome from "./pages/home/BeforeLoginHome";
-import AfterLoginHome from "./pages/home/AfterLoginHome";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import VerifyEmail from "./pages/other/VerifyEmail";
 import UpdatePassword from "./pages/other/UpdatePassword";
 import GenerateID from "./pages/GenerateID";
+import BulkGenerate from "./pages/BulkGenerate";
+import TemplatesPage from "./pages/TemplatesPage";
 import Dashboard from "./pages/Dashboard";
 import PrivacyPolicy from "./pages/other/PrivacyPolicy";
 import TermsOfService from "./pages/other/TermsOfService";
@@ -35,7 +35,7 @@ function ProtectedRoute({ children }) {
 function PublicRoute({ children }) {
   return !isAuthenticated()
     ? children
-    : <Navigate to="/home" replace />;
+    : <Navigate to="/dashboard" replace />;
 }
 
 export default function App() {
@@ -44,12 +44,11 @@ export default function App() {
       <Routes>
 
         {/* ROOT ROUTE (SMART) */}
-        {/* If user is already login and verified then they will go to AfterLogin Home page */}
         <Route
           path="/"
           element={
             isAuthenticated()
-              ? <AfterLoginHome />
+              ? <Navigate to="/dashboard" replace />
               : <BeforeLoginHome />
           }
         />
@@ -76,7 +75,6 @@ export default function App() {
         {/* -------- ALWAYS PUBLIC (LEGAL / INFO) -------- */}
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsOfService />} />
-        <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/helpsupport" element={<HelpSupport />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/about" element={<About />} />
@@ -84,11 +82,7 @@ export default function App() {
         {/* -------- PROTECTED ROUTES -------- */}
         <Route
           path="/home"
-          element={
-            <ProtectedRoute>
-              <AfterLoginHome />
-            </ProtectedRoute>
-          }
+          element={<Navigate to="/dashboard" replace />}
         />
 
         <Route
@@ -105,6 +99,24 @@ export default function App() {
           element={
             <ProtectedRoute>
               <GenerateID />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/bulk-generate"
+          element={
+            <ProtectedRoute>
+              <BulkGenerate />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/templates"
+          element={
+            <ProtectedRoute>
+              <TemplatesPage />
             </ProtectedRoute>
           }
         />
