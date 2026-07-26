@@ -13,7 +13,8 @@ export const authenticate = (req, res, next) => {
 
         const token = authHeader.split(" ")[1];
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const secret = process.env.JWT_SECRET || "proid_jwt_secret_key_2026_super_secret";
+        const decoded = jwt.verify(token, secret);
 
         req.user = decoded;
         // { userId, email, role }

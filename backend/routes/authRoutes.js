@@ -73,7 +73,7 @@ router.post("/register", async (req, res) => {
         email: user.email,
         role: user.role
       },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || "proid_jwt_secret_key_2026_super_secret",
       { expiresIn: "7d" }
     );
 
@@ -234,7 +234,7 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    const token = jwt.sign({ userId: user._id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: "7d" });
+    const token = jwt.sign({ userId: user._id, email: user.email, role: user.role }, process.env.JWT_SECRET || "proid_jwt_secret_key_2026_super_secret", { expiresIn: "7d" });
 
     res.json({
       success: true,
